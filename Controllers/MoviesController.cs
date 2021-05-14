@@ -24,8 +24,8 @@ namespace Lab1_.NET.Controllers
         [Route("filter")]
         public async Task<ActionResult<IEnumerable<Movie>>> FilterMovies(string fromDate, string toDate)
         {
-            DateTime startDate = Convert.ToDateTime(fromDate);
-            DateTime endDate = Convert.ToDateTime(toDate);
+            var startDate = Convert.ToDateTime(fromDate);
+            var endDate = Convert.ToDateTime(toDate);
 
             var filteredMovies = _context.Movies
                 .Where(m => m.DateAdded >= startDate && m.DateAdded <= endDate)
