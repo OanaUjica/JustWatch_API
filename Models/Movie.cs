@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.Serialization;
 
 namespace Lab1_.NET.Models
 {
@@ -15,12 +19,13 @@ namespace Lab1_.NET.Models
         public string Description { get; set; }
 
         [Required]
-        [EnumDataType(typeof(Genre), ErrorMessage = "Please enter a genre.")]
-        public Genre Genre { get; set; }
+        [EnumDataType(typeof(MovieGenre), ErrorMessage = "Please enter a genre.")]
+        [Column(TypeName = "nvarchar(20)")]
+        [JsonConverter(typeof(StringEnumConverter))]
+        public MovieGenre Genre { get; set; }
 
-        public string DurationInMinutes { get; set; }
-
-        [Required(ErrorMessage = "Year of release is required.")]
+        public ushort? DurationInMinutes { get; set; }
+                
         public ushort YearOfRelease { get; set; }
 
         public string Director { get; set; }
@@ -29,16 +34,20 @@ namespace Lab1_.NET.Models
         public DateTime DateAdded { get; set; }
 
         [Range(1, 10)]
-        public float? Rating { get; set; }
+        public float Rating { get; set; }
 
         public bool Watched { get; set; }
     }
 
-    public enum Genre
+    public enum MovieGenre
     {
+        [EnumMember(Value = "Action")]
         Action,
+        [EnumMember(Value = "Comedy")]
         Comedy,
+        [EnumMember(Value = "Horror")]
         Horror,
+        [EnumMember(Value = "Thriller")]
         Thriller
     }
 }

@@ -10,10 +10,10 @@
       <th>Title</th>
       <th>Description</th>
       <th>Genre</th>
-      <th>DurationInMinutes</th>
-      <th>YearOfRelease</th>
+      <th>Duration</th>
+      <th>Release</th>
       <th>Director</th>
-      <th>DateAdded</th>
+      <th>Date Added</th>
       <th>Rating</th>
       <th>Watched</th>
     </tr>
@@ -28,7 +28,7 @@
       <td>{{ movie.director }}</td>
       <td>{{ movie.dateAdded }}</td>
       <td>{{ movie.rating }}</td>
-      <td>{{ movie.watched }}</td>
+      <td>{{ movie.watched ? "yes" : "no" }}</td>
     </tr>
   </tbody>
 </table>
