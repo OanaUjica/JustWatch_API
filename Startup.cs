@@ -1,4 +1,5 @@
 using Lab1_.NET.Data;
+using Lab1_.NET.Mapping;
 using Lab1_.NET.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -82,7 +83,7 @@ namespace Lab1_.NET
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
-            services.AddAutoMapper(typeof(Startup));
+            services.AddAutoMapper(typeof(MappingMovies));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
