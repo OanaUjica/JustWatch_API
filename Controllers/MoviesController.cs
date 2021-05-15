@@ -6,8 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Lab1_.NET.Data;
 using Lab1_.NET.Models;
-using AutoMapper;
-using Lab1_.NET.ViewModels;
 using Microsoft.AspNetCore.Http;
 
 namespace Lab1_.NET.Controllers
@@ -17,12 +15,10 @@ namespace Lab1_.NET.Controllers
     public class MoviesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper;
 
-        public MoviesController(ApplicationDbContext context, IMapper mapper)
+        public MoviesController(ApplicationDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
 
         /// <summary>
@@ -136,7 +132,7 @@ namespace Lab1_.NET.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Movie>> GetMovie(int id)
         {
-            var movie = await _context.Movies.Where(m => m.Id == id).Include(m => m.Comments).FirstOrDefaultAsync();
+            var movie = await _context.Movies.FindAsync(id);
 
             if (movie == null)
             {
