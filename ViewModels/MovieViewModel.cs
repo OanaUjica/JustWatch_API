@@ -17,7 +17,7 @@ namespace Lab1_.NET.ViewModels
 
 
         [EnumDataType(typeof(MovieGenre), ErrorMessage = "Please enter a genre.")]
-        [JsonConverter(typeof(StringEnumConverter))]
+        //[JsonConverter(typeof(StringEnumConverter))]
         public MovieGenre Genre { get; set; }
 
         public ushort? DurationInMinutes { get; set; }
@@ -36,13 +36,13 @@ namespace Lab1_.NET.ViewModels
 
     public enum MovieGenre
     {
-        [EnumMember(Value = "Action")]
+        //[EnumMember(Value = "Action")]
         Action,
-        [EnumMember(Value = "Comedy")]
+        //[EnumMember(Value = "Comedy")]
         Comedy,
-        [EnumMember(Value = "Horror")]
+        //[EnumMember(Value = "Horror")]
         Horror,
-        [EnumMember(Value = "Thriller")]
+        //[EnumMember(Value = "Thriller")]
         Thriller
     }
 }

@@ -9,6 +9,7 @@ namespace Lab1_.NET.Data
     public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
     {
         public DbSet<Movie> Movies { get; set; }
+        public DbSet<Comment> Comments { get; set; }
 
         public ApplicationDbContext(
             DbContextOptions options,

@@ -56,6 +56,62 @@ namespace Lab1_.NET.Controllers
         }
 
         /// <summary>
+        /// Get movie with comments
+        /// </summary>
+        /// <response code="200">Get movie with comments</response>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [HttpGet("{id}/Comments")]
+        public async Task<ActionResult<IEnumerable<Movie>>> GetCommentsForMovie(int id)
+        {
+            var query = _context.Movies.Where(m => m.Id == id).Include(m => m.Comments).Select(m => new Movie
+            {
+                Id = m.Id,
+                Title = m.Title,
+                Description = m.Description,
+                Genre = m.Genre,
+                DurationInMinutes = m.DurationInMinutes,
+                YearOfRelease = m.YearOfRelease,
+                Director = m.Director,
+                DateAdded = m.DateAdded,
+                Rating = m.Rating,
+                Watched = m.Watched,
+                Comments = m.Comments.Select(mc => new Comment
+                {
+                    Id = mc.Id,
+                    Text = mc.Text,
+                    Important = mc.Important,
+                    DateTime = mc.DateTime
+                }).ToList()
+            });
+
+            var moviesWithComments =  await query.ToListAsync();
+            return Ok(moviesWithComments);
+        }
+
+        /// <summary>
+        /// Add a new comment to movie
+        /// </summary>
+        /// <response code="200">Add a new comment to movie</response>
+        /// <response code="404">Movie not found</response>
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [HttpPost("{id}/Comments")]
+        public async Task<ActionResult<Movie>> PostCommentForMovie(int id, Comment comment)
+        {
+            var movie = _context.Movies.Where(m => m.Id == id).Include(m => m.Comments).FirstOrDefault();
+            if (movie == null)
+            {
+                return NotFound();
+            }
+
+            movie.Comments.Add(comment);
+            _context.Entry(movie).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetMovieWithComments", new { id = movie.Id }, "New comment successfully created");
+        }
+
+        /// <summary>
         /// Get a list of movies
         /// </summary>
         /// <response code="200">Get a list of movies</response>
@@ -80,7 +136,7 @@ namespace Lab1_.NET.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Movie>> GetMovie(int id)
         {
-            var movie = await _context.Movies.FindAsync(id);
+            var movie = await _context.Movies.Where(m => m.Id == id).Include(m => m.Comments).FirstOrDefaultAsync();
 
             if (movie == null)
             {
@@ -140,13 +196,12 @@ namespace Lab1_.NET.Controllers
         // POST: api/Movies
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Movie>> PostMovie([FromBody] MovieViewModel movieViewModel)
+        public async Task<ActionResult<Movie>> PostMovie([FromBody] Movie movie)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var movie = _mapper.Map<Movie>(movieViewModel);
 
             _context.Movies.Add(movie);
 
