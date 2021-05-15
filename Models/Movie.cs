@@ -12,17 +12,15 @@ namespace Lab1_.NET.Models
         [Key]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Title is required.")]
+        [Required]
         public string Title { get; set; }
 
-        [Required(ErrorMessage = "Description is required.")]
+        [Required]
         public string Description { get; set; }
 
         [Required]
-        [EnumDataType(typeof(MovieGenre), ErrorMessage = "Please enter a genre.")]
         [Column(TypeName = "nvarchar(20)")]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public MovieGenre Genre { get; set; }
+        public string Genre { get; set; }
 
         public ushort? DurationInMinutes { get; set; }
                 
@@ -33,21 +31,8 @@ namespace Lab1_.NET.Models
         [DataType(DataType.DateTime)]
         public DateTime DateAdded { get; set; }
 
-        [Range(1, 10)]
         public float Rating { get; set; }
 
         public bool Watched { get; set; }
-    }
-
-    public enum MovieGenre
-    {
-        [EnumMember(Value = "Action")]
-        Action,
-        [EnumMember(Value = "Comedy")]
-        Comedy,
-        [EnumMember(Value = "Horror")]
-        Horror,
-        [EnumMember(Value = "Thriller")]
-        Thriller
     }
 }
