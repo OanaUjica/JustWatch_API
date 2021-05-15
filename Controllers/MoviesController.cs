@@ -34,8 +34,18 @@ namespace Lab1_.NET.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
         [Route("filter")]
-        public async Task<ActionResult<IEnumerable<Movie>>> FilterMoviesByDateAdded(DateTime fromDate, DateTime toDate)
+        public async Task<ActionResult<IEnumerable<Movie>>> FilterMoviesByDateAdded(DateTime? fromDate, DateTime? toDate)
         {
+            if (!fromDate.HasValue || !toDate.HasValue)
+            {
+                return BadRequest("Both dates are required");
+            }
+
+            if (fromDate >= toDate)
+            {
+                return BadRequest("fromDate is not before toDate");
+            }
+
             var filteredMovies = await _context.Movies
                 .Where(m => m.DateAdded >= fromDate && m.DateAdded <= toDate)
                 .OrderByDescending(m => m.YearOfRelease)
