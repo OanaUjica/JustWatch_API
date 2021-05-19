@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Lab1_.NET.Data;
 using Lab1_.NET.Models;
 using Microsoft.AspNetCore.Http;
+using AutoMapper;
+using Lab1_.NET.ViewModels;
 
 namespace Lab1_.NET.Controllers
 {
@@ -15,10 +17,12 @@ namespace Lab1_.NET.Controllers
     public class MoviesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public MoviesController(ApplicationDbContext context)
+        public MoviesController(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -57,30 +61,35 @@ namespace Lab1_.NET.Controllers
         /// <response code="200">Get movie with comments</response>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("{id}/Comments")]
-        public async Task<ActionResult<IEnumerable<Movie>>> GetCommentsForMovie(int id)
+        public async Task<ActionResult<IEnumerable<MovieWithCommentsViewModel>>> GetCommentsForMovie(int id)
         {
-            var query = _context.Movies.Where(m => m.Id == id).Include(m => m.Comments).Select(m => new Movie
-            {
-                Id = m.Id,
-                Title = m.Title,
-                Description = m.Description,
-                Genre = m.Genre,
-                DurationInMinutes = m.DurationInMinutes,
-                YearOfRelease = m.YearOfRelease,
-                Director = m.Director,
-                DateAdded = m.DateAdded,
-                Rating = m.Rating,
-                Watched = m.Watched,
-                Comments = m.Comments.Select(mc => new Comment
-                {
-                    Id = mc.Id,
-                    Text = mc.Text,
-                    Important = mc.Important,
-                    DateTime = mc.DateTime
-                }).ToList()
-            });
+            //var query_1 = _context.Movies.Where(m => m.Id == id).Include(m => m.Comments).Select(m => new Movie
+            //{
+            //    Id = m.Id,
+            //    Title = m.Title,
+            //    Description = m.Description,
+            //    Genre = m.Genre,
+            //    DurationInMinutes = m.DurationInMinutes,
+            //    YearOfRelease = m.YearOfRelease,
+            //    Director = m.Director,
+            //    DateAdded = m.DateAdded,
+            //    Rating = m.Rating,
+            //    Watched = m.Watched,
+            //    Comments = m.Comments.Select(mc => new Comment
+            //    {
+            //        Id = mc.Id,
+            //        Text = mc.Text,
+            //        Important = mc.Important,
+            //        DateTime = mc.DateTime
+            //    }).ToList()
+            //});
 
-            var moviesWithComments =  await query.ToListAsync();
+            var moviesWithComments = await _context.Movies
+                .Where(m => m.Id == id)
+                .Include(m => m.Comments)
+                .Select(m => _mapper.Map<MovieWithCommentsViewModel>(m))
+                .ToListAsync();
+
             return Ok(moviesWithComments);
         }
 
