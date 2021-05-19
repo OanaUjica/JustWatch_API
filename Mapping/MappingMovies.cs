@@ -8,9 +8,11 @@ namespace Lab1_.NET.Mapping
     {
         public MappingMovies()
         {
-            //CreateMap<Movie, MovieViewModel>();
+            CreateMap<Movie, MovieViewModel>();
 
-            CreateMap<MovieViewModel, Movie>();
+            CreateMap<Comment, CommentViewModel>();
+
+            CreateMap<Movie, MovieWithCommentsViewModel>();
         }
     }
 }

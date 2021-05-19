@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Lab1_.NET.ViewModels
 {
-    public class MovieViewModel
+    public class MovieWithCommentsViewModel
     {
         public int Id { get; set; }
 
@@ -25,5 +25,7 @@ namespace Lab1_.NET.ViewModels
         public float Rating { get; set; }
 
         public bool Watched { get; set; }
+
+        public IEnumerable<CommentViewModel> Comments { get; set; }
     }
 }
