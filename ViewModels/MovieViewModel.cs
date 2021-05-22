@@ -25,5 +25,7 @@ namespace Lab1_.NET.ViewModels
         public float Rating { get; set; }
 
         public bool Watched { get; set; }
+
+        public IEnumerable<CommentViewModel> Comments { get; set; }
     }
 }

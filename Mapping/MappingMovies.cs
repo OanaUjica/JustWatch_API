@@ -8,11 +8,11 @@ namespace Lab1_.NET.Mapping
     {
         public MappingMovies()
         {
-            CreateMap<Movie, MovieViewModel>();
+            CreateMap<Movie, MovieViewModel>().ReverseMap();
 
-            CreateMap<Comment, CommentViewModel>();
+            CreateMap<Comment, CommentViewModel>().ReverseMap();
 
-            CreateMap<Movie, MovieWithCommentsViewModel>();
+            CreateMap<Movie, MovieWithCommentsViewModel>().ReverseMap();
         }
     }
 }
