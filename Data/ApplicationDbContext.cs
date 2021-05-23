@@ -11,6 +11,8 @@ namespace Lab1_.NET.Data
         public DbSet<Movie> Movies { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Reservation> Reservations { get; set; }
+
 
         public ApplicationDbContext(
             DbContextOptions options,

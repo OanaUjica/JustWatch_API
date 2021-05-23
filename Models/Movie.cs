@@ -1,10 +1,5 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Runtime.Serialization;
 
 namespace Lab1_.NET.Models
 {
@@ -36,6 +31,8 @@ namespace Lab1_.NET.Models
         public bool Watched { get; set; }
 
         public List<Comment> Comments { get; set; }
+
+        public List<Reservation> Reservations { get; set; }
     }
 
     public enum MovieGenre

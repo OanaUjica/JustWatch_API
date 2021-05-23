@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -84,7 +83,6 @@ namespace Lab1_.NET.Controllers
             {
                 var claims = new[] {
                     new Claim(JwtRegisteredClaimNames.Sub, user.UserName)
-                    //new Claim(JwtRegisteredClaimNames.na)
                 };
                 var signinKey = new SymmetricSecurityKey(
                   Encoding.UTF8.GetBytes(_configuration["Jwt:SigningKey"]));
