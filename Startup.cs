@@ -1,6 +1,10 @@
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Lab1_.NET.Data;
 using Lab1_.NET.Mapping;
 using Lab1_.NET.Models;
+using Lab1_.NET.Validators;
+using Lab1_.NET.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -33,12 +37,10 @@ namespace Lab1_.NET
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers()
-                    .AddNewtonsoftJson(options =>
-                    {
-                        options.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
-                        options.SerializerSettings.Converters.Add(new StringEnumConverter());
-                    }).SetCompatibilityVersion(CompatibilityVersion.Latest);
+            services.AddControllersWithViews()
+                .AddFluentValidation()
+                .AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter()));
+
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(
                     Configuration.GetConnectionString("DefaultConnection")));
@@ -68,13 +70,16 @@ namespace Lab1_.NET
                     };
                 });
             services.AddControllersWithViews();
+
             services.AddRazorPages();
             // In production, the Angular files will be served from this directory
+
             services.AddSpaStaticFiles(configuration =>
             {
                 configuration.RootPath = "ClientApp/dist";
             });
             services.AddSwaggerGen();
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo
@@ -100,7 +105,10 @@ namespace Lab1_.NET
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
+
             services.AddAutoMapper(typeof(MappingMovies));
+
+            services.AddTransient<IValidator<MovieViewModel>, MovieValidator>(); // sau add scoped
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

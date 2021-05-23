@@ -17,5 +17,22 @@ namespace Lab1_.NET.Data
             IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
         {
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Movie>()
+                .Property(m => m.Title)
+                .IsRequired();
+
+            modelBuilder.Entity<Movie>()
+                .Property(m => m.Description)
+                .IsRequired();
+
+            modelBuilder.Entity<Movie>()
+                .Property(m => m.Genre)
+                .IsRequired();
+        }
     }
 }
