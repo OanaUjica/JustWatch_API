@@ -34,7 +34,7 @@ namespace Lab1_.NET.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpGet]
         [Route("filter")]
-        public async Task<ActionResult<IEnumerable<Movie>>> FilterMoviesByDateAdded(DateTime? fromDate, DateTime? toDate)
+        public async Task<ActionResult<IEnumerable<MovieViewModel>>> FilterMoviesByDateAdded(DateTime? fromDate, DateTime? toDate)
         {
             if (!fromDate.HasValue || !toDate.HasValue)
             {
@@ -49,7 +49,8 @@ namespace Lab1_.NET.Controllers
             var filteredMovies = await _context.Movies
                 .Where(m => m.DateAdded >= fromDate && m.DateAdded <= toDate)
                 .OrderByDescending(m => m.YearOfRelease)
-                .Select(m => m)
+                .Include(m => m.Comments)
+                .Select(m => _mapper.Map<MovieViewModel>(m))
                 .ToListAsync();
 
             return Ok(filteredMovies);
@@ -63,27 +64,6 @@ namespace Lab1_.NET.Controllers
         [HttpGet("{id}/Comments")]
         public async Task<ActionResult<IEnumerable<MovieWithCommentsViewModel>>> GetCommentsForMovie(int id)
         {
-            //var query_1 = _context.Movies.Where(m => m.Id == id).Include(m => m.Comments).Select(m => new Movie
-            //{
-            //    Id = m.Id,
-            //    Title = m.Title,
-            //    Description = m.Description,
-            //    Genre = m.Genre,
-            //    DurationInMinutes = m.DurationInMinutes,
-            //    YearOfRelease = m.YearOfRelease,
-            //    Director = m.Director,
-            //    DateAdded = m.DateAdded,
-            //    Rating = m.Rating,
-            //    Watched = m.Watched,
-            //    Comments = m.Comments.Select(mc => new Comment
-            //    {
-            //        Id = mc.Id,
-            //        Text = mc.Text,
-            //        Important = mc.Important,
-            //        DateTime = mc.DateTime
-            //    }).ToList()
-            //});
-
             var moviesWithComments = await _context.Movies
                 .Where(m => m.Id == id)
                 .Include(m => m.Comments)
@@ -96,24 +76,29 @@ namespace Lab1_.NET.Controllers
         /// <summary>
         /// Add a new comment to movie
         /// </summary>
-        /// <response code="200">Add a new comment to movie</response>
+        /// <response code="201">Add a new comment to movie</response>
         /// <response code="404">Movie not found</response>
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPost("{id}/Comments")]
-        public async Task<ActionResult<Movie>> PostCommentForMovie(int id, Comment comment)
+        public async Task<ActionResult> PostCommentForMovie(int id, CommentViewModel commentVM)
         {
-            var movie = _context.Movies.Where(m => m.Id == id).Include(m => m.Comments).FirstOrDefault();
+            var commentDB = _mapper.Map<Comment>(commentVM);
+
+            var movie = await _context.Movies
+                .Where(m => m.Id == id)
+                .Include(m => m.Comments)
+                .FirstOrDefaultAsync();
             if (movie == null)
             {
                 return NotFound();
             }
 
-            movie.Comments.Add(comment);
+            movie.Comments.Add(commentDB);
             _context.Entry(movie).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetMovieWithComments", new { id = movie.Id }, "New comment successfully created");
+            return CreatedAtAction("GetMovieWithComments", new { id = commentDB.Id }, "New comment successfully added");
         }
 
         /// <summary>
@@ -123,9 +108,12 @@ namespace Lab1_.NET.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         // GET: api/Movies
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Movie>>> Getmovies()
+        public async Task<ActionResult<IEnumerable<MovieViewModel>>> Getmovies()
         {
-            var movies =  await _context.Movies.ToListAsync();
+            var movies =  await _context.Movies
+                .Include(m => m.Comments)
+                .Select(m => _mapper.Map<MovieViewModel>(m))
+                .ToListAsync();
 
             return Ok(movies);
         }
@@ -139,16 +127,21 @@ namespace Lab1_.NET.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         // GET: api/Movies/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Movie>> GetMovie(int id)
+        public async Task<ActionResult<MovieViewModel>> GetMovie(int id)
         {
-            var movie = await _context.Movies.FindAsync(id);
+            var movie = await _context.Movies
+                .Where(m => m.Id == id)
+                .Include(m => m.Comments)
+                .FirstOrDefaultAsync();
 
             if (movie == null)
             {
                 return NotFound();
             }
 
-            return Ok(movie);
+            var movieVM = _mapper.Map<MovieViewModel>(movie);
+
+            return Ok(movieVM);
         }
 
         /// <summary>
@@ -163,9 +156,11 @@ namespace Lab1_.NET.Controllers
         // PUT: api/Movies/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutMovie(int id, Movie movie)
+        public async Task<IActionResult> PutMovie(int id, MovieViewModel movieVM)
         {
-            if (id != movie.Id)
+            var movie = _mapper.Map<Movie>(movieVM);
+
+            if (movie == null)
             {
                 return BadRequest();
             }
@@ -201,13 +196,14 @@ namespace Lab1_.NET.Controllers
         // POST: api/Movies
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<Movie>> PostMovie([FromBody] Movie movie)
+        public async Task<ActionResult<MovieViewModel>> PostMovie([FromBody] MovieViewModel movieVM)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
+            var movie = _mapper.Map<Movie>(movieVM);
             _context.Movies.Add(movie);
 
             await _context.SaveChangesAsync();
