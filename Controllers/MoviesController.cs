@@ -196,14 +196,14 @@ namespace Lab1_.NET.Controllers
         // POST: api/Movies
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<MovieViewModel>> PostMovie([FromBody] MovieViewModel movieVM)
+        public async Task<ActionResult<MovieViewModel>> PostMovie([FromBody] MovieViewModel movieRequest)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var movie = _mapper.Map<Movie>(movieVM);
+            var movie = _mapper.Map<Movie>(movieRequest);
             _context.Movies.Add(movie);
 
             await _context.SaveChangesAsync();

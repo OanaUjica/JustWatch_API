@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Lab1_.NET.Controllers
 {
-    [Authorize]
+    [Authorize(AuthenticationSchemes = "Identity.Application,Bearer")]
     [ApiController]
     [Route("api/[controller]")]
     public class WeatherForecastController : ControllerBase
