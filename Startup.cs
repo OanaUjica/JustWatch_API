@@ -3,6 +3,7 @@ using FluentValidation.AspNetCore;
 using Lab1_.NET.Data;
 using Lab1_.NET.Mapping;
 using Lab1_.NET.Models;
+using Lab1_.NET.Services;
 using Lab1_.NET.Validators;
 using Lab1_.NET.ViewModels;
 using Microsoft.AspNetCore.Authentication;
@@ -138,7 +139,8 @@ namespace Lab1_.NET
 
             services.AddAutoMapper(typeof(MappingMovies));
 
-            services.AddTransient<IValidator<MovieViewModel>, MovieValidator>(); // sau add scoped
+            services.AddTransient<IValidator<MovieViewModel>, MovieValidator>();
+            services.AddTransient<IAuthManagementService, AuthManagementService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -154,6 +156,12 @@ namespace Lab1_.NET
             {
                 app.UseDeveloperExceptionPage();
                 app.UseMigrationsEndPoint();
+
+                app.UseCors(builder =>
+                builder.AllowAnyOrigin()
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                );
             }
             else
             {
