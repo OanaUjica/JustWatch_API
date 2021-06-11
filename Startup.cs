@@ -137,7 +137,7 @@ namespace Lab1_.NET
                 c.IncludeXmlComments(xmlPath);
             });
 
-            services.AddAutoMapper(typeof(MappingMovies));
+            services.AddAutoMapper(typeof(MappingProfile));
 
             services.AddTransient<IValidator<MovieViewModel>, MovieValidator>();
             services.AddTransient<IAuthManagementService, AuthManagementService>();

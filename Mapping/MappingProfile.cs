@@ -5,9 +5,9 @@ using Lab1_.NET.ViewModels.Reservations;
 
 namespace Lab1_.NET.Mapping
 {
-    public class MappingMovies : Profile
+    public class MappingProfile : Profile
     {
-        public MappingMovies()
+        public MappingProfile()
         {
             CreateMap<Movie, MovieViewModel>().ReverseMap();
 

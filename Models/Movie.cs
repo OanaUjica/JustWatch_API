@@ -7,14 +7,14 @@ namespace Lab1_.NET.Models
     {
         public int Id { get; set; }
 
-        //[Required(ErrorMessage = "Title is required.")]
+        //[Required]
         public string Title { get; set; }
 
-        //[Required(ErrorMessage = "Description is required.")]
+        //[Required]
+        //[MinLength(10)]
         public string Description { get; set; }
 
         //[Required]
-        //[EnumDataType(typeof(MovieGenre), ErrorMessage = "Please enter a genre.")]
         public string Genre { get; set; }
 
         public ushort? DurationInMinutes { get; set; }
