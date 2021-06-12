@@ -11,6 +11,7 @@ using Lab1_.NET.Data;
 using Lab1_.NET.Models;
 using Lab1_.NET.ViewModels.Reservations;
 using Microsoft.AspNetCore.Http;
+using System;
 
 namespace Lab1_.NET.Controllers
 {
@@ -40,7 +41,16 @@ namespace Lab1_.NET.Controllers
         [HttpPost]
         public async Task<ActionResult> PlaceReservation(NewReservationRequest newReservationRequest)
         {
-            var user = await _userManager.FindByNameAsync(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var user = new ApplicationUser();
+            try
+            {
+                user = await _userManager?.FindByNameAsync(User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            }
+            catch (ArgumentNullException)
+            {
+                //return BadRequest("Please login!");
+                return Unauthorized();
+            }
 
             var reservedMovies = new List<Movie>();
             newReservationRequest.ReservedMovieIds.ForEach(rid =>
@@ -78,7 +88,16 @@ namespace Lab1_.NET.Controllers
         [HttpGet]
         public async Task<ActionResult> GetAllReservations()
         {
-            var user = await _userManager.FindByNameAsync(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var user = new ApplicationUser();
+            try
+            {
+                user = await _userManager?.FindByNameAsync(User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            }
+            catch (ArgumentNullException)
+            {
+                //return BadRequest("Please login!");
+                return Unauthorized();
+            }
 
             var result = await _context.Reservations
                 .Where(o => o.ApplicationUser.Id == user.Id)
@@ -102,7 +121,16 @@ namespace Lab1_.NET.Controllers
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateReservation(int id, NewReservationRequest updateReservationRequest)
         {
-            var user = await _userManager.FindByNameAsync(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            var user = new ApplicationUser();
+            try
+            {
+                user = await _userManager?.FindByNameAsync(User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            }
+            catch (ArgumentNullException)
+            {
+                //return BadRequest("Please login!");
+                return Unauthorized();
+            }
 
             var reservedMovies = new List<Movie>();
             updateReservationRequest.ReservedMovieIds.ForEach(rid =>
@@ -164,7 +192,15 @@ namespace Lab1_.NET.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReservation(int id)
         {
-            var user = await _userManager.FindByNameAsync(User.FindFirst(ClaimTypes.NameIdentifier).Value);
+            try
+            {
+                var user = await _userManager?.FindByNameAsync(User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+            }
+            catch (ArgumentNullException)
+            {
+                //return BadRequest("Please login!");
+                return Unauthorized();
+            }
 
             var reservation = await _context.Reservations.FindAsync(id);
             if (reservation == null)

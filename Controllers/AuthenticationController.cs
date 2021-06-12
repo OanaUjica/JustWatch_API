@@ -18,7 +18,7 @@ namespace Lab1_.NET.Controllers
         }
 
         [HttpPost]
-        [Route("register")] // /api/authentication/register
+        [Route("register")]
         public async Task<ActionResult> RegisterUser(RegisterRequest registerRequest)
         {
             var registerServiceResult = await _authenticationService.RegisterUser(registerRequest);
