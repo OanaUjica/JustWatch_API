@@ -79,8 +79,7 @@ namespace Lab1_.NET.Services
             if (user != null && await _userManager.CheckPasswordAsync(user, loginRequest.Password))
             {
                 var claims = new[] {
-                    new Claim(JwtRegisteredClaimNames.Sub, user.UserName)
-                    //new Claim(JwtRegisteredClaimNames.na)
+                    new Claim(JwtRegisteredClaimNames.Sub, user.UserName)                    
                 };
                 var signinKey = new SymmetricSecurityKey(
                   Encoding.UTF8.GetBytes(_configuration["Jwt:SigningKey"]));
