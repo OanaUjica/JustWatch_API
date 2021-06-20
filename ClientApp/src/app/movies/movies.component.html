@@ -1,0 +1,35 @@
+<h1 id="tableLabel">Movies</h1>
+
+<p>List of best movies of all times.</p>
+
+<p *ngIf="!movies"><em>Loading...</em></p>
+
+<table class='table table-striped' aria-labelledby="tableLabel" *ngIf="movies">
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Description</th>
+      <th>Genre</th>
+      <th>Duration</th>
+      <th>Release</th>
+      <th>Director</th>
+      <th>Date Added</th>
+      <th>Rating</th>
+      <th>Watched</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let movie of movies">
+      <td>{{ movie.title }}</td>
+      <td>{{ movie.description }}</td>
+      <td>{{ movie.genre }}</td>
+      <td>{{ movie.durationInMinutes }}</td>
+      <td>{{ movie.yearOfRelease }}</td>
+      <td>{{ movie.director }}</td>
+      <td>{{ movie.dateAdded }}</td>
+      <td>{{ movie.rating }}</td>
+      <td>{{ movie.watched ? "yes" : "no" }}</td>
+    </tr>
+  </tbody>
+</table>
+
