@@ -1,0 +1,5 @@
+﻿build:
+  docker:
+    web: Dockerfile
+run:
+  web: bundle exec cinema-art -C config/cinema-art.rb
