@@ -12,6 +12,7 @@ using Lab1_.NET.Models;
 using Lab1_.NET.ViewModels.Reservations;
 using Microsoft.AspNetCore.Http;
 using System;
+using Lab1_.NET.Services;
 
 namespace Lab1_.NET.Controllers
 {
@@ -20,14 +21,12 @@ namespace Lab1_.NET.Controllers
     [Route("api/[controller]")]
     public class ReservationsController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper;
+        private readonly IReservationsService _reservationsService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public ReservationsController(ApplicationDbContext context, IMapper mapper, UserManager<ApplicationUser> userManager)
+        public ReservationsController(IReservationsService reservationsService, UserManager<ApplicationUser> userManager)
         {
-            _context = context;
-            _mapper = mapper;
+            _reservationsService = reservationsService;
             _userManager = userManager;
         }
 
@@ -48,35 +47,18 @@ namespace Lab1_.NET.Controllers
             }
             catch (ArgumentNullException)
             {
-                //return BadRequest("Please login!");
-                return Unauthorized();
+                return Unauthorized("Please login!");
             }
 
-            var reservedMovies = new List<Movie>();
-            newReservationRequest.ReservedMovieIds.ForEach(rid =>
+            var reservationServiceResult = await _reservationsService.PlaceReservation(newReservationRequest, user);
+            if (reservationServiceResult.ResponseError != null)
             {
-                var movieWithId = _context.Movies.Find(rid);
-                if (movieWithId != null)
-                {
-                    reservedMovies.Add(movieWithId);
-                }
-            });
-
-            if (reservedMovies.Count == 0)
-            {
-                return BadRequest();
+                return BadRequest(reservationServiceResult.ResponseError);
             }
 
-            var reservation = new Reservation
-            {
-                ApplicationUser = user,
-                ReservationDateTime = newReservationRequest.ReservationDateTime.GetValueOrDefault(),
-                Movies = reservedMovies
-            };
+            var reservation = reservationServiceResult.ResponseOk;
 
-            _context.Reservations.Add(reservation);
-            await _context.SaveChangesAsync();
-            return CreatedAtAction("GetMovieWithComments", new { id = reservation.Id }, "New reservation successfully added");
+            return CreatedAtAction("GetReservations", new { id = reservation.Id }, "New reservation successfully added");
         }
 
 
@@ -95,18 +77,12 @@ namespace Lab1_.NET.Controllers
             }
             catch (ArgumentNullException)
             {
-                //return BadRequest("Please login!");
-                return Unauthorized();
+                return Unauthorized("Please login!");
             }
 
-            var result = await _context.Reservations
-                .Where(o => o.ApplicationUser.Id == user.Id)
-                .Include(o => o.Movies)
-                .FirstOrDefaultAsync();
+            var reservationServiceResult = await _reservationsService.GetAllReservations(user);
 
-            var resultViewModel = _mapper.Map<ReservationsForUserResponse>(result);
-
-            return Ok(resultViewModel);
+            return Ok(reservationServiceResult.ResponseOk);
         }
 
         /// <summary>
@@ -128,55 +104,13 @@ namespace Lab1_.NET.Controllers
             }
             catch (ArgumentNullException)
             {
-                //return BadRequest("Please login!");
-                return Unauthorized();
+                return Unauthorized("Please login!");
             }
 
-            var reservedMovies = new List<Movie>();
-            updateReservationRequest.ReservedMovieIds.ForEach(rid =>
+            var reservationServiceResult = await _reservationsService.UpdateReservation(id, updateReservationRequest, user);
+            if (reservationServiceResult.ResponseError != null)
             {
-                var movieWithId = _context.Movies.Find(rid);
-                if (movieWithId != null)
-                {
-                    reservedMovies.Add(movieWithId);
-                }
-            });
-
-            if (reservedMovies.Count == 0)
-            {
-                return BadRequest();
-            }
-
-            //var reservation = _mapper.Map<Reservation>(reservedMovies);
-            var reservation = new Reservation
-            {
-                Id = id,
-                ApplicationUser = user,
-                ReservationDateTime = updateReservationRequest.ReservationDateTime.GetValueOrDefault(),
-                Movies = reservedMovies
-            };
-
-            if (reservation == null)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(reservation).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ReservationExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(reservationServiceResult.ResponseError);
             }
 
             return NoContent();
@@ -198,25 +132,21 @@ namespace Lab1_.NET.Controllers
             }
             catch (ArgumentNullException)
             {
-                //return BadRequest("Please login!");
-                return Unauthorized();
+                return Unauthorized("Please login!");                
             }
 
-            var reservation = await _context.Reservations.FindAsync(id);
-            if (reservation == null)
+            if (!_reservationsService.ReservationExists(id))
             {
                 return NotFound();
             }
 
-            _context.Reservations.Remove(reservation);
-            await _context.SaveChangesAsync();
+            var reservationServiceResult = await _reservationsService.DeleteReservation(id);
+            if (reservationServiceResult.ResponseError != null)
+            {
+                return BadRequest(reservationServiceResult.ResponseError);
+            }
 
             return NoContent();
-        }
-
-        private bool ReservationExists(int id)
-        {
-            return _context.Reservations.Any(e => e.Id == id);
         }
     }
 }

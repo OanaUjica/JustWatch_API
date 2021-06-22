@@ -18,18 +18,15 @@ namespace Lab1_.NET.Services
     public class AuthManagementService : IAuthManagementService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ApplicationDbContext _context;
         private readonly IConfiguration _configuration;
 
 
         public AuthManagementService(UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager,
             ApplicationDbContext context,
             IConfiguration configuration)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
             _context = context;
             _configuration = configuration;
         }

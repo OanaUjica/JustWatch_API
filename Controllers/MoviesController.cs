@@ -9,9 +9,10 @@ using Lab1_.NET.Models;
 using Microsoft.AspNetCore.Http;
 using AutoMapper;
 using Lab1_.NET.ViewModels;
-using Microsoft.AspNetCore.Authorization;
+using Lab1_.NET.Services;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Lab1_.NET.Controllers
 {
@@ -19,14 +20,12 @@ namespace Lab1_.NET.Controllers
     [ApiController]
     public class MoviesController : ControllerBase
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper;
+        private readonly IMoviesService _moviesService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public MoviesController(ApplicationDbContext context, IMapper mapper, UserManager<ApplicationUser> userManager)
+        public MoviesController(IMoviesService moviesService, UserManager<ApplicationUser> userManager)
         {
-            _context = context;
-            _mapper = mapper;
+            _moviesService = moviesService;
             _userManager = userManager;
         }
 
@@ -37,13 +36,11 @@ namespace Lab1_.NET.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         // GET: api/Movies
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MovieViewModel>>> Getmovies()
+        public async Task<ActionResult<IEnumerable<MovieViewModel>>> GetMovies()
         {
-            var movies = await _context.Movies
-                .Select(m => _mapper.Map<MovieViewModel>(m))
-                .ToListAsync();
+            var moviesServiceResult = await _moviesService.GetMovies();
 
-            return Ok(movies);
+            return Ok(moviesServiceResult.ResponseOk);
         }
 
         /// <summary>
@@ -57,18 +54,13 @@ namespace Lab1_.NET.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<MovieViewModel>> GetMovie(int id)
         {
-            var movie = await _context.Movies
-                .Where(m => m.Id == id)
-                .FirstOrDefaultAsync();
-
-            if (movie == null)
+            var moviesServiceResult = await _moviesService.GetMovie(id);
+            if (moviesServiceResult.ResponseError != null)
             {
-                return NotFound();
+                return BadRequest(moviesServiceResult.ResponseError);
             }
 
-            var movieVM = _mapper.Map<MovieViewModel>(movie);
-
-            return Ok(movieVM);
+            return Ok(moviesServiceResult.ResponseOk);
         }
 
         /// <summary>
@@ -79,13 +71,9 @@ namespace Lab1_.NET.Controllers
         [HttpGet("{id}/Comments")]
         public async Task<ActionResult<IEnumerable<MovieWithCommentsViewModel>>> GetCommentsForMovie(int id)
         {
-            var moviesWithComments = await _context.Movies
-                .Where(m => m.Id == id)
-                .Include(m => m.Comments)
-                .Select(m => _mapper.Map<MovieWithCommentsViewModel>(m))
-                .ToListAsync();
+            var moviesServiceResult = await _moviesService.GetCommentsForMovie(id);
 
-            return Ok(moviesWithComments);
+            return Ok(moviesServiceResult.ResponseOk);
         }
 
         /// <summary>
@@ -99,24 +87,13 @@ namespace Lab1_.NET.Controllers
         [Route("filter")]
         public async Task<ActionResult<IEnumerable<MovieViewModel>>> FilterMoviesByDateAdded(DateTime? fromDate, DateTime? toDate)
         {
-            if (!fromDate.HasValue || !toDate.HasValue)
+            var moviesServiceResult = await _moviesService.FilterMoviesByDateAdded(fromDate, toDate);
+            if (moviesServiceResult.ResponseError != null)
             {
-                return BadRequest("Both dates are required");
+                return BadRequest(moviesServiceResult.ResponseError);
             }
 
-            if (fromDate >= toDate)
-            {
-                return BadRequest("fromDate is not before toDate");
-            }
-
-            var filteredMovies = await _context.Movies
-                .Where(m => m.DateAdded >= fromDate && m.DateAdded <= toDate)
-                .OrderByDescending(m => m.YearOfRelease)
-                .Include(m => m.Comments)
-                .Select(m => _mapper.Map<MovieViewModel>(m))
-                .ToListAsync();
-
-            return Ok(filteredMovies);
+            return Ok(moviesServiceResult.ResponseOk);
         }
 
         /// <summary>
@@ -143,14 +120,16 @@ namespace Lab1_.NET.Controllers
             }
             catch (ArgumentNullException)
             {
-                //return BadRequest("Please login!");
-                return Unauthorized();
+                return Unauthorized("Please login!");
             }
 
-            var movie = _mapper.Map<Movie>(movieRequest);
-            _context.Movies.Add(movie);
+            var moviesServiceResult = await _moviesService.PostMovie(movieRequest);
+            if (moviesServiceResult.ResponseError != null)
+            {
+                return BadRequest(moviesServiceResult.ResponseError);
+            }
 
-            await _context.SaveChangesAsync();
+            var movie = moviesServiceResult.ResponseOk;
 
             return CreatedAtAction("GetMovie", new { id = movie.Id }, "New movie successfully created");
         }
@@ -164,35 +143,26 @@ namespace Lab1_.NET.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPost("{id}/Comments")]
         [Authorize(AuthenticationSchemes = "Identity.Application,Bearer")]
-        public async Task<ActionResult> PostCommentForMovie(int id, CommentViewModel commentVM)
+        public async Task<ActionResult> PostCommentForMovie(int movieId, CommentViewModel commentRequest)
         {
-            var user = new ApplicationUser();
             try
             {
-                user = await _userManager?.FindByNameAsync(User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
+                var user = await _userManager?.FindByNameAsync(User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
             }
             catch (ArgumentNullException)
             {
-                //return BadRequest("Please login!");
-                return Unauthorized();
+                return Unauthorized("Please login!");
             }
 
-            var commentDB = _mapper.Map<Comment>(commentVM);
-
-            var movie = await _context.Movies
-                .Where(m => m.Id == id)
-                .Include(m => m.Comments)
-                .FirstOrDefaultAsync();
-            if (movie == null)
+            var moviesServiceResult = await _moviesService.PostCommentForMovie(movieId, commentRequest);
+            if (moviesServiceResult.ResponseError != null)
             {
-                return NotFound();
+                return BadRequest(moviesServiceResult.ResponseError);
             }
 
-            movie.Comments.Add(commentDB);
-            _context.Entry(movie).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            var movie = moviesServiceResult.ResponseOk;
 
-            return CreatedAtAction("GetMovieWithComments", new { id = commentDB.Id }, "New comment successfully added");
+            return CreatedAtAction("GetMovieWithComments", new { id = movie.Id }, "New comment successfully added");
         }
 
         /// <summary>
@@ -208,7 +178,7 @@ namespace Lab1_.NET.Controllers
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         [Authorize(AuthenticationSchemes = "Identity.Application,Bearer")]
-        public async Task<IActionResult> PutMovie(int id, MovieViewModel movieVM)
+        public async Task<IActionResult> PutMovie(int id, MovieViewModel movieRequest)
         {
             try
             {
@@ -216,33 +186,13 @@ namespace Lab1_.NET.Controllers
             }
             catch (ArgumentNullException)
             {
-                //return BadRequest("Please login!");
-                return Unauthorized();
+                return Unauthorized("Please login!");
             }
 
-            var movie = _mapper.Map<Movie>(movieVM);
-
-            if (movie == null)
+            var moviesServiceResult = await _moviesService.PutMovie(id, movieRequest);
+            if (moviesServiceResult.ResponseError != null)
             {
-                return BadRequest();
-            }
-
-            _context.Entry(movie).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!MovieExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return BadRequest(moviesServiceResult.ResponseError);
             }
 
             return NoContent();
@@ -266,25 +216,22 @@ namespace Lab1_.NET.Controllers
             }
             catch (ArgumentNullException)
             {
-                //return BadRequest("Please login!");
-                return Unauthorized();
+                return Unauthorized("Please login!");
             }
 
-            var movie = await _context.Movies.FindAsync(id);
-            if (movie == null)
+            if (!_moviesService.MovieExists(id))
             {
                 return NotFound();
             }
 
-            _context.Movies.Remove(movie);
-            await _context.SaveChangesAsync();
+            var moviesServiceResult = await _moviesService.DeleteMovie(id);
+
+            if (moviesServiceResult.ResponseError != null)
+            {
+                return BadRequest(moviesServiceResult.ResponseError);
+            }
 
             return NoContent();
-        }
-
-        private bool MovieExists(int id)
-        {
-            return _context.Movies.Any(e => e.Id == id);
         }
     }
 }

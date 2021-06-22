@@ -141,6 +141,8 @@ namespace Lab1_.NET
 
             services.AddTransient<IValidator<MovieViewModel>, MovieValidator>();
             services.AddTransient<IAuthManagementService, AuthManagementService>();
+            services.AddTransient<IMoviesService, MoviesService>();
+            services.AddTransient<IReservationsService, ReservationsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -149,7 +151,7 @@ namespace Lab1_.NET
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Cinema API V1");
             });
 
             if (env.IsDevelopment())
