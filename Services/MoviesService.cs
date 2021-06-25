@@ -22,13 +22,13 @@ namespace Lab1_.NET.Services
             _mapper = mapper;
         }
         
-        public async Task<ServiceResponse<IEnumerable<MovieViewModel>, IEnumerable<EntityError>>> GetMovies()
+        public async Task<ServiceResponse<List<MovieViewModel>, IEnumerable<EntityError>>> GetMovies()
         {
             var movies = await _context.Movies
                 .Select(m => _mapper.Map<MovieViewModel>(m))
                 .ToListAsync();
 
-            var serviceResponse = new ServiceResponse<IEnumerable<MovieViewModel>, IEnumerable<EntityError>>();
+            var serviceResponse = new ServiceResponse<List<MovieViewModel>, IEnumerable<EntityError>>();
             serviceResponse.ResponseOk = movies;
             return serviceResponse;
         }
@@ -51,7 +51,7 @@ namespace Lab1_.NET.Services
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<IEnumerable<MovieWithCommentsViewModel>, IEnumerable<EntityError>>> GetCommentsForMovie(int id)
+        public async Task<ServiceResponse<List<MovieWithCommentsViewModel>, IEnumerable<EntityError>>> GetCommentsForMovie(int id)
         {
             var moviesWithComments = await _context.Movies
                 .Where(m => m.Id == id)
@@ -59,15 +59,15 @@ namespace Lab1_.NET.Services
                 .Select(m => _mapper.Map<MovieWithCommentsViewModel>(m))
                 .ToListAsync();
 
-            var serviceResponse = new ServiceResponse<IEnumerable<MovieWithCommentsViewModel>, IEnumerable<EntityError>>();
+            var serviceResponse = new ServiceResponse<List<MovieWithCommentsViewModel>, IEnumerable<EntityError>>();
             serviceResponse.ResponseOk = moviesWithComments;
 
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<IEnumerable<MovieViewModel>, IEnumerable<EntityError>>> FilterMoviesByDateAdded(DateTime? fromDate, DateTime? toDate)
+        public async Task<ServiceResponse<List<MovieViewModel>, IEnumerable<EntityError>>> FilterMoviesByDateAdded(DateTime? fromDate, DateTime? toDate)
         {
-            var serviceResponse = new ServiceResponse<IEnumerable<MovieViewModel>, IEnumerable<EntityError>>();
+            var serviceResponse = new ServiceResponse<List<MovieViewModel>, IEnumerable<EntityError>>();
             var errors = new List<EntityError>();
 
             if (!fromDate.HasValue || !toDate.HasValue)
