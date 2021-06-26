@@ -12,7 +12,7 @@ namespace Lab1_.NET.Services
     {
         Task<ServiceResponse<Reservation, IEnumerable<EntityError>>> PlaceReservation(NewReservationRequest newReservationRequest, ApplicationUser user);
 
-        Task<ServiceResponse<ReservationsForUserResponse, IEnumerable<EntityError>>> GetAllReservations(ApplicationUser user);
+        Task<ServiceResponse<List<ReservationsForUserResponse>, IEnumerable<EntityError>>> GetAllReservations(ApplicationUser user);
 
         Task<ServiceResponse<Reservation, IEnumerable<EntityError>>> UpdateReservation(int id, NewReservationRequest updateReservationRequest, ApplicationUser user);
 

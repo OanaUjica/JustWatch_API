@@ -1,18 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 using System.Threading.Tasks;
-using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Lab1_.NET.Data;
 using Lab1_.NET.Models;
 using Lab1_.NET.ViewModels.Reservations;
 using Microsoft.AspNetCore.Http;
 using System;
 using Lab1_.NET.Services;
+using System.Collections.Generic;
 
 namespace Lab1_.NET.Controllers
 {
@@ -68,7 +64,7 @@ namespace Lab1_.NET.Controllers
         /// <response code="200">Get reservations</response>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
-        public async Task<ActionResult> GetAllReservations()
+        public async Task<ActionResult<IEnumerable<ReservationsForUserResponse>>> GetAllReservations()
         {
             var user = new ApplicationUser();
             try

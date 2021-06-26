@@ -16,25 +16,22 @@ namespace Lab1_.NET.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
-        private readonly UserManager<ApplicationUser> _userManager;
 
-        public ReservationsService(ApplicationDbContext context, IMapper mapper, UserManager<ApplicationUser> userManager)
+        public ReservationsService(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
-            _userManager = userManager;
         }
 
-        public async Task<ServiceResponse<ReservationsForUserResponse, IEnumerable<EntityError>>> GetAllReservations(ApplicationUser user)
+        public async Task<ServiceResponse<List<ReservationsForUserResponse>, IEnumerable<EntityError>>> GetAllReservations(ApplicationUser user)
         {
             var reservationsFromDb = await _context.Reservations
                 .Where(o => o.ApplicationUser.Id == user.Id)
                 .Include(o => o.Movies)
-                .FirstOrDefaultAsync();
-
-            var reservationsForUserResponse = _mapper.Map<ReservationsForUserResponse>(reservationsFromDb);
-
-            var serviceResponse = new ServiceResponse<ReservationsForUserResponse, IEnumerable<EntityError>>();
+                .ToListAsync();
+            var reservationsForUserResponse = _mapper.Map<List<Reservation>, List<ReservationsForUserResponse>>(reservationsFromDb);
+            
+            var serviceResponse = new ServiceResponse<List<ReservationsForUserResponse>, IEnumerable<EntityError>>();
             serviceResponse.ResponseOk = reservationsForUserResponse;
 
             return serviceResponse;
