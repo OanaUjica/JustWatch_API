@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Lab1_.NET.Data;
 using Lab1_.NET.Models;
 using Microsoft.AspNetCore.Http;
-using AutoMapper;
 using Lab1_.NET.ViewModels;
 using Lab1_.NET.Services;
 using Microsoft.AspNetCore.Identity;
@@ -55,9 +51,10 @@ namespace Lab1_.NET.Controllers
         public async Task<ActionResult<MovieViewModel>> GetMovie(int id)
         {
             var moviesServiceResult = await _moviesService.GetMovie(id);
-            if (moviesServiceResult.ResponseError != null)
+
+            if (moviesServiceResult.ResponseOk == null)
             {
-                return BadRequest(moviesServiceResult.ResponseError);
+                return NotFound();
             }
 
             return Ok(moviesServiceResult.ResponseOk);
@@ -71,6 +68,17 @@ namespace Lab1_.NET.Controllers
         [HttpGet("{id}/Comments")]
         public async Task<ActionResult<IEnumerable<MovieWithCommentsViewModel>>> GetCommentsForMovie(int id)
         {
+            if (!_moviesService.MovieExists(id))
+            {
+                return NotFound();
+            }
+
+            var movieResponse = await _moviesService.GetMovie(id);
+            if (movieResponse.ResponseOk == null)
+            {
+                return NotFound();
+            }
+
             var moviesServiceResult = await _moviesService.GetCommentsForMovie(id);
 
             return Ok(moviesServiceResult.ResponseOk);
@@ -187,6 +195,11 @@ namespace Lab1_.NET.Controllers
             catch (ArgumentNullException)
             {
                 return Unauthorized("Please login!");
+            }
+
+            if (!_moviesService.MovieExists(id))
+            {
+                return NotFound();
             }
 
             var moviesServiceResult = await _moviesService.PutMovie(id, movieRequest);

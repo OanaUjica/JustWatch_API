@@ -40,12 +40,6 @@ namespace Lab1_.NET.Services
                 .Where(m => m.Id == id)
                 .FirstOrDefaultAsync();
 
-            if (movie == null)
-            {
-                serviceResponse.ResponseError = "No movie found";
-                return serviceResponse;
-            }
-
             var movieResponse = _mapper.Map<MovieViewModel>(movie);
             serviceResponse.ResponseOk = movieResponse;
             return serviceResponse;
@@ -59,8 +53,10 @@ namespace Lab1_.NET.Services
                 .Select(m => _mapper.Map<MovieWithCommentsViewModel>(m))
                 .ToListAsync();
 
-            var serviceResponse = new ServiceResponse<List<MovieWithCommentsViewModel>, IEnumerable<EntityError>>();
-            serviceResponse.ResponseOk = moviesWithComments;
+            var serviceResponse = new ServiceResponse<List<MovieWithCommentsViewModel>, IEnumerable<EntityError>>
+            {
+                ResponseOk = moviesWithComments
+            };
 
             return serviceResponse;
         }

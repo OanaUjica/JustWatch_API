@@ -103,6 +103,11 @@ namespace Lab1_.NET.Controllers
                 return Unauthorized("Please login!");
             }
 
+            if (!_reservationsService.ReservationExists(id))
+            {
+                return NotFound();
+            }
+
             var reservationServiceResult = await _reservationsService.UpdateReservation(id, updateReservationRequest, user);
             if (reservationServiceResult.ResponseError != null)
             {
