@@ -64,7 +64,7 @@ namespace Lab1_.NET.Controllers
         /// <response code="200">Get reservations</response>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ReservationsForUserResponse>>> GetAllReservations()
+        public async Task<ActionResult<IEnumerable<ReservationsForUserResponse>>> GetAllReservations(int? page = 1, int? perPage = 5)
         {
             var user = new ApplicationUser();
             try
@@ -76,7 +76,7 @@ namespace Lab1_.NET.Controllers
                 return Unauthorized("Please login!");
             }
 
-            var reservationServiceResult = await _reservationsService.GetAllReservations(user);
+            var reservationServiceResult = await _reservationsService.GetAllReservations(user, page, perPage);
 
             return Ok(reservationServiceResult.ResponseOk);
         }

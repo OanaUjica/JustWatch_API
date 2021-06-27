@@ -32,9 +32,9 @@ namespace Lab1_.NET.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         // GET: api/Movies
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<MovieViewModel>>> GetMovies()
+        public async Task<ActionResult<IEnumerable<MovieViewModel>>> GetMovies(int? page = 1, int? perPage = 5)
         {
-            var moviesServiceResult = await _moviesService.GetMovies();
+            var moviesServiceResult = await _moviesService.GetMovies(page, perPage);
 
             return Ok(moviesServiceResult.ResponseOk);
         }
@@ -66,7 +66,7 @@ namespace Lab1_.NET.Controllers
         /// <response code="200">Get movie with comments</response>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("{id}/Comments")]
-        public async Task<ActionResult<IEnumerable<MovieWithCommentsViewModel>>> GetCommentsForMovie(int id)
+        public async Task<ActionResult<IEnumerable<MovieWithCommentsViewModel>>> GetCommentsForMovie(int id, int? page = 1, int? perPage = 5)
         {
             if (!_moviesService.MovieExists(id))
             {
@@ -79,7 +79,7 @@ namespace Lab1_.NET.Controllers
                 return NotFound();
             }
 
-            var moviesServiceResult = await _moviesService.GetCommentsForMovie(id);
+            var moviesServiceResult = await _moviesService.GetCommentsForMovie(id, page, perPage);
 
             return Ok(moviesServiceResult.ResponseOk);
         }

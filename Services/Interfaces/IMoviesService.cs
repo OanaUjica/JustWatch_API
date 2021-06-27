@@ -10,13 +10,13 @@ namespace Lab1_.NET.Services
 {
     public interface IMoviesService
     {
-        Task<ServiceResponse<List<MovieViewModel>, IEnumerable<EntityError>>> GetMovies();
+        Task<ServiceResponse<PaginatedResultSet<MovieViewModel>, IEnumerable<EntityError>>> GetMovies(int? page = 1, int? perPage = 5);
 
         Task<ServiceResponse<MovieViewModel, string>> GetMovie(int id);
 
-        Task<ServiceResponse<List<MovieWithCommentsViewModel>, IEnumerable<EntityError>>> GetCommentsForMovie(int id);
+        Task<ServiceResponse<PaginatedResultSet<MovieWithCommentsViewModel>, IEnumerable<EntityError>>> GetCommentsForMovie(int id, int? page = 1, int? perPage = 5);
 
-        Task<ServiceResponse<List<MovieViewModel>, IEnumerable<EntityError>>> FilterMoviesByDateAdded(DateTime? fromDate, DateTime? toDate);
+        Task<ServiceResponse<PaginatedResultSet<MovieViewModel>, IEnumerable<EntityError>>> FilterMoviesByDateAdded(DateTime? fromDate, DateTime? toDate, int? page = 1, int? perPage = 5);
 
         Task<ServiceResponse<Movie, IEnumerable<EntityError>>> PostMovie(MovieViewModel movieRequest);
 

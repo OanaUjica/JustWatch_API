@@ -22,14 +22,31 @@ namespace Lab1_.NET.Services
             _mapper = mapper;
         }
         
-        public async Task<ServiceResponse<List<MovieViewModel>, IEnumerable<EntityError>>> GetMovies()
+        public async Task<ServiceResponse<PaginatedResultSet<MovieViewModel>, IEnumerable<EntityError>>> GetMovies(int? page = 1, int? perPage = 5)
         {
             var movies = await _context.Movies
+                .OrderBy(m => m.Id)
+                .Skip((page.Value - 1) * perPage.Value)
+                .Take(perPage.Value)
                 .Select(m => _mapper.Map<MovieViewModel>(m))
                 .ToListAsync();
 
-            var serviceResponse = new ServiceResponse<List<MovieViewModel>, IEnumerable<EntityError>>();
-            serviceResponse.ResponseOk = movies;
+            if (page == null || page < 1)
+            {
+                page = 1;
+            }
+            if (perPage == null || perPage > 100)
+            {
+                perPage = 20;
+            }
+
+            int count = await _context.Movies.CountAsync();
+            var resultSet = new PaginatedResultSet<MovieViewModel>(movies, page.Value, count, perPage.Value);
+
+            var serviceResponse = new ServiceResponse<PaginatedResultSet<MovieViewModel>, IEnumerable<EntityError>>
+            {
+                ResponseOk = resultSet
+            };
             return serviceResponse;
         }
 
@@ -45,25 +62,40 @@ namespace Lab1_.NET.Services
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<MovieWithCommentsViewModel>, IEnumerable<EntityError>>> GetCommentsForMovie(int id)
+        public async Task<ServiceResponse<PaginatedResultSet<MovieWithCommentsViewModel>, IEnumerable<EntityError>>> GetCommentsForMovie(int id, int? page = 1, int? perPage = 5)
         {
             var moviesWithComments = await _context.Movies
                 .Where(m => m.Id == id)
                 .Include(m => m.Comments)
+                .OrderBy(m => m.Id)
+                .Skip((page.Value - 1) * perPage.Value)
+                .Take(perPage.Value)
                 .Select(m => _mapper.Map<MovieWithCommentsViewModel>(m))
                 .ToListAsync();
 
-            var serviceResponse = new ServiceResponse<List<MovieWithCommentsViewModel>, IEnumerable<EntityError>>
+            if (page == null || page < 1)
             {
-                ResponseOk = moviesWithComments
+                page = 1;
+            }
+            if (perPage == null || perPage > 100)
+            {
+                perPage = 20;
+            }
+
+            int count = await _context.Movies.CountAsync();
+            var resultSet = new PaginatedResultSet<MovieWithCommentsViewModel>(moviesWithComments, page.Value, count, perPage.Value);
+
+            var serviceResponse = new ServiceResponse<PaginatedResultSet<MovieWithCommentsViewModel>, IEnumerable<EntityError>>
+            {
+                ResponseOk = resultSet
             };
 
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<List<MovieViewModel>, IEnumerable<EntityError>>> FilterMoviesByDateAdded(DateTime? fromDate, DateTime? toDate)
+        public async Task<ServiceResponse<PaginatedResultSet<MovieViewModel>, IEnumerable<EntityError>>> FilterMoviesByDateAdded(DateTime? fromDate, DateTime? toDate, int? page = 1, int? perPage = 5)
         {
-            var serviceResponse = new ServiceResponse<List<MovieViewModel>, IEnumerable<EntityError>>();
+            var serviceResponse = new ServiceResponse<PaginatedResultSet<MovieViewModel>, IEnumerable<EntityError>>();
             var errors = new List<EntityError>();
 
             if (!fromDate.HasValue || !toDate.HasValue)
@@ -85,9 +117,23 @@ namespace Lab1_.NET.Services
                 .OrderByDescending(m => m.YearOfRelease)
                 .Include(m => m.Comments)
                 .Select(m => _mapper.Map<MovieViewModel>(m))
+                .Skip((page.Value - 1) * perPage.Value)
+                .Take(perPage.Value)
                 .ToListAsync();
 
-            serviceResponse.ResponseOk = filteredMovies;
+            if (page == null || page < 1)
+            {
+                page = 1;
+            }
+            if (perPage == null || perPage > 100)
+            {
+                perPage = 20;
+            }
+
+            int count = await _context.Movies.CountAsync();
+            var resultSet = new PaginatedResultSet<MovieViewModel>(filteredMovies, page.Value, count, perPage.Value);
+
+            serviceResponse.ResponseOk = resultSet;
 
             return serviceResponse;
         }
@@ -106,8 +152,11 @@ namespace Lab1_.NET.Services
             }
             catch (Exception e)
             {
-                var errors = new List<EntityError>();
-                errors.Add(new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message });
+                var errors = new List<EntityError>
+                {
+                    new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message }
+                };
+                serviceResponse.ResponseError = errors;
             }
 
             return serviceResponse;
@@ -133,8 +182,11 @@ namespace Lab1_.NET.Services
             }
             catch (Exception e)
             {
-                var errors = new List<EntityError>();
-                errors.Add(new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message });
+                var errors = new List<EntityError>
+                {
+                    new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message }
+                };
+                serviceResponse.ResponseError = errors;
             }
 
             return serviceResponse;
@@ -155,8 +207,11 @@ namespace Lab1_.NET.Services
             }
             catch (Exception e)
             {
-                var errors = new List<EntityError>();
-                errors.Add(new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message });
+                var errors = new List<EntityError>
+                {
+                    new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message }
+                };
+                serviceResponse.ResponseError = errors;
             }
 
             return serviceResponse;
@@ -175,8 +230,10 @@ namespace Lab1_.NET.Services
             }
             catch (Exception e)
             {
-                var errors = new List<EntityError>();
-                errors.Add(new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message });
+                var errors = new List<EntityError>
+                {
+                    new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message }
+                };
                 serviceResponse.ResponseError = errors;
             }
 

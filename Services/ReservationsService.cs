@@ -2,6 +2,7 @@
 using Lab1_.NET.Data;
 using Lab1_.NET.ErrorHandling;
 using Lab1_.NET.Models;
+using Lab1_.NET.ViewModels;
 using Lab1_.NET.ViewModels.Reservations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -23,16 +24,32 @@ namespace Lab1_.NET.Services
             _mapper = mapper;
         }
 
-        public async Task<ServiceResponse<List<ReservationsForUserResponse>, IEnumerable<EntityError>>> GetAllReservations(ApplicationUser user)
+        public async Task<ServiceResponse<PaginatedResultSet<ReservationsForUserResponse>, IEnumerable<EntityError>>> GetAllReservations(ApplicationUser user, int? page = 1, int? perPage = 5)
         {
             var reservationsFromDb = await _context.Reservations
                 .Where(o => o.ApplicationUser.Id == user.Id)
                 .Include(o => o.Movies)
+                .OrderBy(m => m.Id)
+                .Skip((page.Value - 1) * perPage.Value)
+                .Take(perPage.Value)
                 .ToListAsync();
+
+            if (page == null || page < 1)
+            {
+                page = 1;
+            }
+            if (perPage == null || perPage > 100)
+            {
+                perPage = 20;
+            }
+
             var reservationsForUserResponse = _mapper.Map<List<Reservation>, List<ReservationsForUserResponse>>(reservationsFromDb);
-            
-            var serviceResponse = new ServiceResponse<List<ReservationsForUserResponse>, IEnumerable<EntityError>>();
-            serviceResponse.ResponseOk = reservationsForUserResponse;
+
+            int count = await _context.Movies.CountAsync();
+            var resultSet = new PaginatedResultSet<ReservationsForUserResponse>(reservationsForUserResponse, page.Value, count, perPage.Value);
+                        
+            var serviceResponse = new ServiceResponse<PaginatedResultSet<ReservationsForUserResponse>, IEnumerable<EntityError>>();
+            serviceResponse.ResponseOk = resultSet;
 
             return serviceResponse;
         }
