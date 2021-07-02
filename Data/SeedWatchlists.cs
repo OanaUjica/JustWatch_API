@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Lab1_.NET.Data
 {
-    public class SeedReservations
+    public class SeedWatchlists
     {
         private static readonly Random random = new();
 
@@ -18,17 +18,17 @@ namespace Lab1_.NET.Data
             var numberOfMovies = context.Movies.Count();
             var numberOfUsers = context.ApplicationUsers.Count();
 
-            if (context.Reservations.Count() < 1200)
+            if (context.Watchlists.Count() < 1200)
             {
                 for (int i = 0; i < count; ++i)
                 {
                     var movies = context.Movies.Skip(random.Next(1, numberOfMovies)).Take(2).ToList();
-                    var user = context.ApplicationUsers.Skip(random.Next(1, numberOfUsers)).Take(1).First();
+                    var user = context.ApplicationUsers.Take(1).First();
 
-                    context.Reservations.Add(new Reservation
+                    context.Watchlists.Add(new Watchlist
                     {
                         Movies = movies,
-                        ReservationDateTime = GetRandomDate(),
+                        WatchlistDateAdded = GetRandomDate(),
                         ApplicationUser = user
                     });
                 }

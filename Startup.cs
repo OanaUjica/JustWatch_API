@@ -87,12 +87,12 @@ namespace Lab1_.NET
                 c.SwaggerDoc("v1", new OpenApiInfo
                 {
                     Version = "v1",
-                    Title = "Movies API",
-                    Description = "A simple example ASP.NET Core Web API",
+                    Title = "Just Watch API",
+                    Description = "An ASP.NET Core Web API",
                     TermsOfService = new Uri("https://example.com/terms"),
                     Contact = new OpenApiContact
                     {
-                        Name = "Shayne Boyer",
+                        Name = "Oana Ujica",
                         Email = string.Empty,
                         Url = new Uri("https://twitter.com/spboyer"),
                     },
@@ -142,7 +142,7 @@ namespace Lab1_.NET
             services.AddTransient<IValidator<MovieViewModel>, MovieValidator>();
             services.AddTransient<IAuthManagementService, AuthManagementService>();
             services.AddTransient<IMoviesService, MoviesService>();
-            services.AddTransient<IReservationsService, ReservationsService>();
+            services.AddTransient<IWatchlistsService, WatchlistsService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

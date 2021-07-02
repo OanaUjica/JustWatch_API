@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Lab1_.NET.Data
 {
-    public class SeedComments
+    public class SeedReviews
     {
         private static readonly string Characters = "abcdefghijklmnopqrstuvwxyz123456890";
         private static readonly Random random = new();
@@ -16,13 +16,13 @@ namespace Lab1_.NET.Data
             context.Database.EnsureCreated();
             var numberOfMovies = context.Movies.Count();
 
-            if (context.Comments.Count() < 1200)
+            if (context.Reviews.Count() < 1200)
             {
                 for (int i = 0; i < count; ++i)
                 {
                     var movie = context.Movies.Skip(random.Next(1, numberOfMovies)).Take(1).First();
 
-                    context.Comments.Add(new Comment
+                    context.Reviews.Add(new Review
                     {
                         Text = GetRandomString(3, 10),
                         Important = GetRandomBoolean(),

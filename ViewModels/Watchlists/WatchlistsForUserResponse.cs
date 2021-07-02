@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Lab1_.NET.ViewModels.Reservations
 {
-    public class ReservationsForUserResponse
+    public class WatchlistsForUserResponse
     {
         public ApplicationUserViewModel ApplicationUser { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Lab1_.NET.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace Lab1_.NET.ViewModels.Authentication
 {

@@ -11,13 +11,13 @@ namespace Lab1_.NET.Mapping
         {
             CreateMap<Movie, MovieViewModel>().ReverseMap();
 
-            CreateMap<Comment, CommentViewModel>().ReverseMap();
+            CreateMap<Review, ReviewViewModel>().ReverseMap();
 
-            CreateMap<Movie, MovieWithCommentsViewModel>().ReverseMap();
+            CreateMap<Movie, MovieWithReviewsViewModel>().ReverseMap();
 
             CreateMap<ApplicationUser, ApplicationUserViewModel>().ReverseMap();
 
-            CreateMap<Reservation, ReservationsForUserResponse>().ReverseMap();
+            CreateMap<Watchlist, WatchlistsForUserResponse>().ReverseMap();
         }
     }
 }

@@ -37,6 +37,9 @@ namespace Lab1_.NET.Services
             {
                 Email = registerRequest.Email,
                 UserName = registerRequest.Email,
+                FirstName = registerRequest.FirstName,
+                LastName = registerRequest.LastName,
+                Role = registerRequest.Role,
                 SecurityStamp = Guid.NewGuid().ToString()
             };
 
@@ -91,7 +94,7 @@ namespace Lab1_.NET.Services
                   claims: claims
                 );
 
-                serviceResponse.ResponseOk = new LoginResponse { Token = new JwtSecurityTokenHandler().WriteToken(token), Expiration = token.ValidTo };
+                serviceResponse.ResponseOk = new LoginResponse {FirstName = user.FirstName, LastName = user.LastName, Email = user.Email, Role = user.Role, Token = new JwtSecurityTokenHandler().WriteToken(token), Expiration = token.ValidTo };
             }
 
             return serviceResponse;

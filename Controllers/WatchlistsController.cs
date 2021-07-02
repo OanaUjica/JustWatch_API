@@ -15,14 +15,14 @@ namespace Lab1_.NET.Controllers
     [Authorize(AuthenticationSchemes = "Identity.Application,Bearer")]
     [ApiController]
     [Route("api/[controller]")]
-    public class ReservationsController : ControllerBase
+    public class WatchlistsController : ControllerBase
     {
-        private readonly IReservationsService _reservationsService;
+        private readonly IWatchlistsService _watchlistsService;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public ReservationsController(IReservationsService reservationsService, UserManager<ApplicationUser> userManager)
+        public WatchlistsController(IWatchlistsService watchlistsService, UserManager<ApplicationUser> userManager)
         {
-            _reservationsService = reservationsService;
+            _watchlistsService = watchlistsService;
             _userManager = userManager;
         }
 
@@ -34,7 +34,7 @@ namespace Lab1_.NET.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost]
-        public async Task<ActionResult> PlaceReservation(NewReservationRequest newReservationRequest)
+        public async Task<ActionResult> PlaceWatchlist(NewWatchlistRequest newWatchlistRequest)
         {
             var user = new ApplicationUser();
             try
@@ -46,7 +46,7 @@ namespace Lab1_.NET.Controllers
                 return Unauthorized("Please login!");
             }
 
-            var reservationServiceResult = await _reservationsService.PlaceReservation(newReservationRequest, user);
+            var reservationServiceResult = await _watchlistsService.PlaceWatchlists(newWatchlistRequest, user);
             if (reservationServiceResult.ResponseError != null)
             {
                 return BadRequest(reservationServiceResult.ResponseError);
@@ -64,7 +64,7 @@ namespace Lab1_.NET.Controllers
         /// <response code="200">Get reservations</response>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ReservationsForUserResponse>>> GetAllReservations(int? page = 1, int? perPage = 5)
+        public async Task<ActionResult<IEnumerable<WatchlistsForUserResponse>>> GetAllWatchlists(int? page = 1, int? perPage = 5)
         {
             var user = new ApplicationUser();
             try
@@ -76,7 +76,7 @@ namespace Lab1_.NET.Controllers
                 return Unauthorized("Please login!");
             }
 
-            var reservationServiceResult = await _reservationsService.GetAllReservations(user, page, perPage);
+            var reservationServiceResult = await _watchlistsService.GetAllWatchlists(user, page, perPage);
 
             return Ok(reservationServiceResult.ResponseOk);
         }
@@ -91,7 +91,7 @@ namespace Lab1_.NET.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateReservation(int id, NewReservationRequest updateReservationRequest)
+        public async Task<IActionResult> UpdateWatchlist(int id, NewWatchlistRequest updateReservationRequest)
         {
             var user = new ApplicationUser();
             try
@@ -103,12 +103,12 @@ namespace Lab1_.NET.Controllers
                 return Unauthorized("Please login!");
             }
 
-            if (!_reservationsService.ReservationExists(id))
+            if (!_watchlistsService.WatchlistExists(id))
             {
                 return NotFound();
             }
 
-            var reservationServiceResult = await _reservationsService.UpdateReservation(id, updateReservationRequest, user);
+            var reservationServiceResult = await _watchlistsService.UpdateWatchlist(id, updateReservationRequest, user);
             if (reservationServiceResult.ResponseError != null)
             {
                 return BadRequest(reservationServiceResult.ResponseError);
@@ -125,7 +125,7 @@ namespace Lab1_.NET.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteReservation(int id)
+        public async Task<IActionResult> DeleteWatchlist(int id)
         {
             try
             {
@@ -136,12 +136,12 @@ namespace Lab1_.NET.Controllers
                 return Unauthorized("Please login!");                
             }
 
-            if (!_reservationsService.ReservationExists(id))
+            if (!_watchlistsService.WatchlistExists(id))
             {
                 return NotFound();
             }
 
-            var reservationServiceResult = await _reservationsService.DeleteReservation(id);
+            var reservationServiceResult = await _watchlistsService.DeleteWatchlist(id);
             if (reservationServiceResult.ResponseError != null)
             {
                 return BadRequest(reservationServiceResult.ResponseError);

@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Lab1_.NET.Models
+namespace Lab1_.NET.ViewModels
 {
-    public class Comment
+    public class ReviewViewModel
     {
         public int Id { get; set; }
 
@@ -11,8 +14,5 @@ namespace Lab1_.NET.Models
         public bool Important { get; set; }
 
         public DateTime DateTime { get; set; }
-
-        public int MovieId { get; set; }
-        public Movie Movie { get; set; }
     }
 }

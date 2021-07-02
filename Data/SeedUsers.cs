@@ -22,10 +22,17 @@ namespace Lab1_.NET.Data
                 for (int i = 0; i < count; ++i)
                 {
                     var email = GetRandomString(2, 10) + "@" + GetRandomString(2, 3);
+                    var firstName = GetRandomString(2, 10);
+                    var lastName = GetRandomString(2, 10);
+                    var role = GetRandomRole();
+
                     var user = new ApplicationUser
                     {
                         Email = email,
                         UserName = email,
+                        FirstName = firstName,
+                        LastName = lastName,
+                        Role = role
                     };
                     user.PasswordHash = userContext.PasswordHasher.HashPassword(user, "Test1234!");
                     context.Users.Add(user);
@@ -45,6 +52,14 @@ namespace Lab1_.NET.Data
             }
 
             return s;
+        }
+
+        private static Role GetRandomRole()
+        {
+            var v = Enum.GetValues(typeof(Role));
+            var randomGenre = (Role)v.GetValue(random.Next(v.Length));
+
+            return randomGenre;
         }
     }
 }

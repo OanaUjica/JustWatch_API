@@ -30,16 +30,24 @@ namespace Lab1_.NET.Models
 
         public bool Watched { get; set; }
 
-        public List<Comment> Comments { get; set; }
+        public List<Review> Reviews { get; set; }
 
-        public List<Reservation> Reservations { get; set; }
+        public List<Watchlist> Watchlists { get; set; }
     }
 
     public enum MovieGenre
     {
         Action,
+        Documentary,
+        Biography,
         Comedy,
+        Adventure,
         Horror,
-        Thriller
+        History,
+        SciFi,
+        Animation,
+        Thriller,
+        Romance,
+        Musical
     }
 }

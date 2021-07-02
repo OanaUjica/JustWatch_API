@@ -26,8 +26,8 @@ namespace Lab1_.NET
                 try
                 {
                     SeedMovies.Seed(services, 1200);
-                    SeedComments.Seed(services, 1200);
-                    SeedReservations.Seed(services, 1200);
+                    SeedReviews.Seed(services, 1200);
+                    SeedWatchlists.Seed(services, 1200);
                     SeedUsers.Seed(services, 1200);
                 }
                 catch (Exception ex)

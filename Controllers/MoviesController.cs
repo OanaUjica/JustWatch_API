@@ -65,8 +65,8 @@ namespace Lab1_.NET.Controllers
         /// </summary>
         /// <response code="200">Get movie with comments</response>
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [HttpGet("{id}/Comments")]
-        public async Task<ActionResult<IEnumerable<MovieWithCommentsViewModel>>> GetCommentsForMovie(int id, int? page = 1, int? perPage = 5)
+        [HttpGet("{id}/Reviews")]
+        public async Task<ActionResult<IEnumerable<MovieWithReviewsViewModel>>> GetReviewsForMovie(int id, int? page = 1, int? perPage = 5)
         {
             if (!_moviesService.MovieExists(id))
             {
@@ -79,7 +79,7 @@ namespace Lab1_.NET.Controllers
                 return NotFound();
             }
 
-            var moviesServiceResult = await _moviesService.GetCommentsForMovie(id, page, perPage);
+            var moviesServiceResult = await _moviesService.GetReviewsForMovie(id, page, perPage);
 
             return Ok(moviesServiceResult.ResponseOk);
         }
@@ -149,9 +149,9 @@ namespace Lab1_.NET.Controllers
         /// <response code="404">Movie not found</response>
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [HttpPost("{id}/Comments")]
+        [HttpPost("{id}/Reviews")]
         [Authorize(AuthenticationSchemes = "Identity.Application,Bearer")]
-        public async Task<ActionResult> PostCommentForMovie(int movieId, CommentViewModel commentRequest)
+        public async Task<ActionResult> PostReviewForMovie(int movieId, ReviewViewModel commentRequest)
         {
             try
             {
@@ -162,7 +162,7 @@ namespace Lab1_.NET.Controllers
                 return Unauthorized("Please login!");
             }
 
-            var moviesServiceResult = await _moviesService.PostCommentForMovie(movieId, commentRequest);
+            var moviesServiceResult = await _moviesService.PostReviewForMovie(movieId, commentRequest);
             if (moviesServiceResult.ResponseError != null)
             {
                 return BadRequest(moviesServiceResult.ResponseError);

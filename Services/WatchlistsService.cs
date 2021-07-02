@@ -13,20 +13,20 @@ using System.Threading.Tasks;
 
 namespace Lab1_.NET.Services
 {
-    public class ReservationsService : IReservationsService
+    public class WatchlistsService : IWatchlistsService
     {
         private readonly ApplicationDbContext _context;
         private readonly IMapper _mapper;
 
-        public ReservationsService(ApplicationDbContext context, IMapper mapper)
+        public WatchlistsService(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
             _mapper = mapper;
         }
 
-        public async Task<ServiceResponse<PaginatedResultSet<ReservationsForUserResponse>, IEnumerable<EntityError>>> GetAllReservations(ApplicationUser user, int? page = 1, int? perPage = 5)
+        public async Task<ServiceResponse<PaginatedResultSet<WatchlistsForUserResponse>, IEnumerable<EntityError>>> GetAllWatchlists(ApplicationUser user, int? page = 1, int? perPage = 5)
         {
-            var reservationsFromDb = await _context.Reservations
+            var watchlistsFromDb = await _context.Watchlists
                 .Where(o => o.ApplicationUser.Id == user.Id)
                 .Include(o => o.Movies)
                 .OrderBy(m => m.Id)
@@ -43,23 +43,23 @@ namespace Lab1_.NET.Services
                 perPage = 20;
             }
 
-            var reservationsForUserResponse = _mapper.Map<List<Reservation>, List<ReservationsForUserResponse>>(reservationsFromDb);
+            var reservationsForUserResponse = _mapper.Map<List<Watchlist>, List<WatchlistsForUserResponse>>(watchlistsFromDb);
 
             int count = await _context.Movies.CountAsync();
-            var resultSet = new PaginatedResultSet<ReservationsForUserResponse>(reservationsForUserResponse, page.Value, count, perPage.Value);
+            var resultSet = new PaginatedResultSet<WatchlistsForUserResponse>(reservationsForUserResponse, page.Value, count, perPage.Value);
                         
-            var serviceResponse = new ServiceResponse<PaginatedResultSet<ReservationsForUserResponse>, IEnumerable<EntityError>>();
+            var serviceResponse = new ServiceResponse<PaginatedResultSet<WatchlistsForUserResponse>, IEnumerable<EntityError>>();
             serviceResponse.ResponseOk = resultSet;
 
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<Reservation, IEnumerable<EntityError>>> PlaceReservation(NewReservationRequest newReservationRequest, ApplicationUser user)
+        public async Task<ServiceResponse<Watchlist, IEnumerable<EntityError>>> PlaceWatchlists(NewWatchlistRequest newWatchlistRequest, ApplicationUser user)
         {
-            var serviceResponse = new ServiceResponse<Reservation, IEnumerable<EntityError>>();
+            var serviceResponse = new ServiceResponse<Watchlist, IEnumerable<EntityError>>();
 
             var reservedMovies = new List<Movie>();
-            newReservationRequest.ReservedMovieIds.ForEach(rid =>
+            newWatchlistRequest.WatchlistMovieIds.ForEach(rid =>
             {
                 var movieWithId = _context.Movies.Find(rid);
                 if (movieWithId != null)
@@ -68,19 +68,19 @@ namespace Lab1_.NET.Services
                 }
             });
 
-            var reservation = new Reservation
+            var watchlist = new Watchlist
             {
                 ApplicationUser = user,
-                ReservationDateTime = newReservationRequest.ReservationDateTime.GetValueOrDefault(),
+                WatchlistDateAdded = newWatchlistRequest.WatchlistDateAdded.GetValueOrDefault(),
                 Movies = reservedMovies
             };
 
-            _context.Reservations.Add(reservation);
+            _context.Watchlists.Add(watchlist);
 
             try
             {
                 await _context.SaveChangesAsync();
-                serviceResponse.ResponseOk = reservation;
+                serviceResponse.ResponseOk = watchlist;
             }
             catch (Exception e)
             {
@@ -91,34 +91,34 @@ namespace Lab1_.NET.Services
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<Reservation, IEnumerable<EntityError>>> UpdateReservation(int id, NewReservationRequest updateReservationRequest, ApplicationUser user)
+        public async Task<ServiceResponse<Watchlist, IEnumerable<EntityError>>> UpdateWatchlist(int id, NewWatchlistRequest updateReservationRequest, ApplicationUser user)
         {
-            var serviceResponse = new ServiceResponse<Reservation, IEnumerable<EntityError>>();
+            var serviceResponse = new ServiceResponse<Watchlist, IEnumerable<EntityError>>();
 
-            var reservedMovies = new List<Movie>();
-            updateReservationRequest.ReservedMovieIds.ForEach(rid =>
+            var watchlistMovies = new List<Movie>();
+            updateReservationRequest.WatchlistMovieIds.ForEach(rid =>
             {
                 var movieWithId = _context.Movies.Find(rid);
                 if (movieWithId != null)
                 {
-                    reservedMovies.Add(movieWithId);
+                    watchlistMovies.Add(movieWithId);
                 }
             });
 
-            var reservation = new Reservation
+            var watchlist = new Watchlist
             {
                 Id = id,
                 ApplicationUser = user,
-                ReservationDateTime = updateReservationRequest.ReservationDateTime.GetValueOrDefault(),
-                Movies = reservedMovies
+                WatchlistDateAdded = updateReservationRequest.WatchlistDateAdded.GetValueOrDefault(),
+                Movies = watchlistMovies
             };
 
-            _context.Entry(reservation).State = EntityState.Modified;
+            _context.Entry(watchlist).State = EntityState.Modified;
 
             try
             {
                 await _context.SaveChangesAsync();
-                serviceResponse.ResponseOk = reservation;
+                serviceResponse.ResponseOk = watchlist;
             }
             catch (Exception e)
             {
@@ -129,14 +129,14 @@ namespace Lab1_.NET.Services
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<bool, IEnumerable<EntityError>>> DeleteReservation(int id)
+        public async Task<ServiceResponse<bool, IEnumerable<EntityError>>> DeleteWatchlist(int id)
         {
             var serviceResponse = new ServiceResponse<bool, IEnumerable<EntityError>>();
 
             try
             {
-                var reservation = await _context.Reservations.FindAsync(id);
-                _context.Reservations.Remove(reservation);
+                var watchlist = await _context.Watchlists.FindAsync(id);
+                _context.Watchlists.Remove(watchlist);
                 await _context.SaveChangesAsync();
                 serviceResponse.ResponseOk = true;
             }
@@ -150,9 +150,9 @@ namespace Lab1_.NET.Services
             return serviceResponse;
         }
 
-        public bool ReservationExists(int id)
+        public bool WatchlistExists(int id)
         {
-            return _context.Reservations.Any(e => e.Id == id);
+            return _context.Watchlists.Any(e => e.Id == id);
         }
     }
 }

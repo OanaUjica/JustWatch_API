@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Lab1_.NET.Data.Migrations
+namespace Lab1_.NET.Migrations
 {
-    public partial class UpdateGenreString : Migration
+    public partial class Update_Watchlists_Movies : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

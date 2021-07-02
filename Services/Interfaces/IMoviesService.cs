@@ -14,13 +14,13 @@ namespace Lab1_.NET.Services
 
         Task<ServiceResponse<MovieViewModel, string>> GetMovie(int id);
 
-        Task<ServiceResponse<PaginatedResultSet<MovieWithCommentsViewModel>, IEnumerable<EntityError>>> GetCommentsForMovie(int id, int? page = 1, int? perPage = 5);
+        Task<ServiceResponse<PaginatedResultSet<MovieWithReviewsViewModel>, IEnumerable<EntityError>>> GetReviewsForMovie(int id, int? page = 1, int? perPage = 5);
 
         Task<ServiceResponse<PaginatedResultSet<MovieViewModel>, IEnumerable<EntityError>>> FilterMoviesByDateAdded(DateTime? fromDate, DateTime? toDate, int? page = 1, int? perPage = 5);
 
         Task<ServiceResponse<Movie, IEnumerable<EntityError>>> PostMovie(MovieViewModel movieRequest);
 
-        Task<ServiceResponse<Comment, IEnumerable<EntityError>>> PostCommentForMovie(int movieId, CommentViewModel commentRequest);
+        Task<ServiceResponse<Review, IEnumerable<EntityError>>> PostReviewForMovie(int movieId, ReviewViewModel commentRequest);
 
         Task<ServiceResponse<Movie, IEnumerable<EntityError>>> PutMovie(int id, MovieViewModel movieRequest);
 

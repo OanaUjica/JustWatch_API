@@ -9,9 +9,9 @@ namespace Lab1_.NET.Data
     public class ApplicationDbContext : ApiAuthorizationDbContext<ApplicationUser>
     {
         public DbSet<Movie> Movies { get; set; }
-        public DbSet<Comment> Comments { get; set; }
+        public DbSet<Review> Reviews { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
-        public DbSet<Reservation> Reservations { get; set; }
+        public DbSet<Watchlist> Watchlists { get; set; }
 
 
         public ApplicationDbContext(

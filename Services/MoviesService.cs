@@ -25,7 +25,7 @@ namespace Lab1_.NET.Services
         public async Task<ServiceResponse<PaginatedResultSet<MovieViewModel>, IEnumerable<EntityError>>> GetMovies(int? page = 1, int? perPage = 5)
         {
             var movies = await _context.Movies
-                .OrderBy(m => m.Id)
+                .OrderBy(m => m.Title)
                 .Skip((page.Value - 1) * perPage.Value)
                 .Take(perPage.Value)
                 .Select(m => _mapper.Map<MovieViewModel>(m))
@@ -62,15 +62,15 @@ namespace Lab1_.NET.Services
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<PaginatedResultSet<MovieWithCommentsViewModel>, IEnumerable<EntityError>>> GetCommentsForMovie(int id, int? page = 1, int? perPage = 5)
+        public async Task<ServiceResponse<PaginatedResultSet<MovieWithReviewsViewModel>, IEnumerable<EntityError>>> GetReviewsForMovie(int id, int? page = 1, int? perPage = 5)
         {
             var moviesWithComments = await _context.Movies
                 .Where(m => m.Id == id)
-                .Include(m => m.Comments)
-                .OrderBy(m => m.Id)
+                .Include(m => m.Reviews)
+                .OrderBy(m => m.Title)
                 .Skip((page.Value - 1) * perPage.Value)
                 .Take(perPage.Value)
-                .Select(m => _mapper.Map<MovieWithCommentsViewModel>(m))
+                .Select(m => _mapper.Map<MovieWithReviewsViewModel>(m))
                 .ToListAsync();
 
             if (page == null || page < 1)
@@ -83,9 +83,9 @@ namespace Lab1_.NET.Services
             }
 
             int count = await _context.Movies.CountAsync();
-            var resultSet = new PaginatedResultSet<MovieWithCommentsViewModel>(moviesWithComments, page.Value, count, perPage.Value);
+            var resultSet = new PaginatedResultSet<MovieWithReviewsViewModel>(moviesWithComments, page.Value, count, perPage.Value);
 
-            var serviceResponse = new ServiceResponse<PaginatedResultSet<MovieWithCommentsViewModel>, IEnumerable<EntityError>>
+            var serviceResponse = new ServiceResponse<PaginatedResultSet<MovieWithReviewsViewModel>, IEnumerable<EntityError>>
             {
                 ResponseOk = resultSet
             };
@@ -115,7 +115,7 @@ namespace Lab1_.NET.Services
             var filteredMovies = await _context.Movies
                 .Where(m => m.DateAdded >= fromDate && m.DateAdded <= toDate)
                 .OrderByDescending(m => m.YearOfRelease)
-                .Include(m => m.Comments)
+                .Include(m => m.Reviews)
                 .Select(m => _mapper.Map<MovieViewModel>(m))
                 .Skip((page.Value - 1) * perPage.Value)
                 .Take(perPage.Value)
@@ -162,20 +162,20 @@ namespace Lab1_.NET.Services
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<Comment, IEnumerable<EntityError>>> PostCommentForMovie(int movieId, CommentViewModel commentRequest)
+        public async Task<ServiceResponse<Review, IEnumerable<EntityError>>> PostReviewForMovie(int movieId, ReviewViewModel commentRequest)
         {
-            var serviceResponse = new ServiceResponse<Comment, IEnumerable<EntityError>>();
+            var serviceResponse = new ServiceResponse<Review, IEnumerable<EntityError>>();
 
-            var commentDB = _mapper.Map<Comment>(commentRequest);
+            var commentDB = _mapper.Map<Review>(commentRequest);
 
             var movie = await _context.Movies
                 .Where(m => m.Id == movieId)
-                .Include(m => m.Comments)
+                .Include(m => m.Reviews)
                 .FirstOrDefaultAsync();
 
             try
             {
-                movie.Comments.Add(commentDB);
+                movie.Reviews.Add(commentDB);
                 _context.Entry(movie).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
                 serviceResponse.ResponseOk = commentDB;
