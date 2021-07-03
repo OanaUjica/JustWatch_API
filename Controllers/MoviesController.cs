@@ -149,9 +149,9 @@ namespace Lab1_.NET.Controllers
         /// <response code="404">Movie not found</response>
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [HttpPost("{id}/Reviews")]
+        [HttpPost("{movieId}/Reviews")]
         [Authorize(AuthenticationSchemes = "Identity.Application,Bearer")]
-        public async Task<ActionResult> PostReviewForMovie(int movieId, ReviewViewModel commentRequest)
+        public async Task<ActionResult> PostReviewForMovie(int movieId, ReviewViewModel reviewRequest)
         {
             try
             {
@@ -162,7 +162,7 @@ namespace Lab1_.NET.Controllers
                 return Unauthorized("Please login!");
             }
 
-            var moviesServiceResult = await _moviesService.PostReviewForMovie(movieId, commentRequest);
+            var moviesServiceResult = await _moviesService.PostReviewForMovie(movieId, reviewRequest);
             if (moviesServiceResult.ResponseError != null)
             {
                 return BadRequest(moviesServiceResult.ResponseError);
@@ -170,7 +170,7 @@ namespace Lab1_.NET.Controllers
 
             var movie = moviesServiceResult.ResponseOk;
 
-            return CreatedAtAction("GetMovieWithComments", new { id = movie.Id }, "New comment successfully added");
+            return CreatedAtAction("GetMovieWithComments", new { id = movie.Id }, "New review successfully added");
         }
 
         /// <summary>

@@ -162,23 +162,21 @@ namespace Lab1_.NET.Services
             return serviceResponse;
         }
 
-        public async Task<ServiceResponse<Review, IEnumerable<EntityError>>> PostReviewForMovie(int movieId, ReviewViewModel commentRequest)
+        public async Task<ServiceResponse<Review, IEnumerable<EntityError>>> PostReviewForMovie(int movieId, ReviewViewModel reviewRequest)
         {
             var serviceResponse = new ServiceResponse<Review, IEnumerable<EntityError>>();
-
-            var commentDB = _mapper.Map<Review>(commentRequest);
 
             var movie = await _context.Movies
                 .Where(m => m.Id == movieId)
                 .Include(m => m.Reviews)
                 .FirstOrDefaultAsync();
-
+            var review = _mapper.Map<Review>(reviewRequest);
             try
             {
-                movie.Reviews.Add(commentDB);
+                movie.Reviews.Add(review);
                 _context.Entry(movie).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
-                serviceResponse.ResponseOk = commentDB;
+                serviceResponse.ResponseOk = review;
             }
             catch (Exception e)
             {
@@ -195,12 +193,11 @@ namespace Lab1_.NET.Services
         public async Task<ServiceResponse<Movie, IEnumerable<EntityError>>> PutMovie(int id, MovieViewModel movieRequest)
         {
             var serviceResponse = new ServiceResponse<Movie, IEnumerable<EntityError>>();
-
+            movieRequest.Id = id;
             var movie = _mapper.Map<Movie>(movieRequest);
 
             try
             {
-
                 _context.Entry(movie).State = EntityState.Modified;
                 await _context.SaveChangesAsync();
                 serviceResponse.ResponseOk = movie;

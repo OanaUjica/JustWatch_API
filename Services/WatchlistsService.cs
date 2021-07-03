@@ -29,7 +29,7 @@ namespace Lab1_.NET.Services
             var watchlistsFromDb = await _context.Watchlists
                 .Where(o => o.ApplicationUser.Id == user.Id)
                 .Include(o => o.Movies)
-                .OrderBy(m => m.Id)
+                .OrderBy(w => w.Id)
                 .Skip((page.Value - 1) * perPage.Value)
                 .Take(perPage.Value)
                 .ToListAsync();
@@ -135,6 +135,29 @@ namespace Lab1_.NET.Services
 
             try
             {
+                var watchlist = await _context.Watchlists.FindAsync(id);
+                _context.Watchlists.Remove(watchlist);
+                await _context.SaveChangesAsync();
+                serviceResponse.ResponseOk = true;
+            }
+            catch (Exception e)
+            {
+                var errors = new List<EntityError>();
+                errors.Add(new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message });
+                serviceResponse.ResponseError = errors;
+            }
+
+            return serviceResponse;
+        }
+
+        public async Task<ServiceResponse<bool, IEnumerable<EntityError>>> DeleteMovieFromWatchlist(int id, string userId)
+        {
+            var serviceResponse = new ServiceResponse<bool, IEnumerable<EntityError>>();
+
+            try
+            {
+                var watchlists = _context.Watchlists.Where(o => o.ApplicationUser.Id == userId).Include(o => o.Movies).ToList();
+
                 var watchlist = await _context.Watchlists.FindAsync(id);
                 _context.Watchlists.Remove(watchlist);
                 await _context.SaveChangesAsync();

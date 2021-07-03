@@ -22,8 +22,8 @@ namespace Lab1_.NET.Data
             {
                 for (int i = 0; i < count; ++i)
                 {
-                    var movies = context.Movies.Skip(random.Next(1, numberOfMovies)).Take(2).ToList();
-                    var user = context.ApplicationUsers.Take(1).First();
+                    var movies = context.Movies.Skip(random.Next(1, numberOfMovies)).Take(1).ToList();
+                    var user = context.ApplicationUsers.Skip(random.Next(1, numberOfUsers)).Take(1).First();
 
                     context.Watchlists.Add(new Watchlist
                     {

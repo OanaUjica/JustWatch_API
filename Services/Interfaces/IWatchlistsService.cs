@@ -19,6 +19,8 @@ namespace Lab1_.NET.Services
 
         Task<ServiceResponse<bool, IEnumerable<EntityError>>> DeleteWatchlist(int id);
 
+        Task<ServiceResponse<bool, IEnumerable<EntityError>>> DeleteMovieFromWatchlist(int id, string userId);
+
         bool WatchlistExists(int id);
     }
 }

@@ -26,6 +26,6 @@ namespace Lab1_.NET.ViewModels
 
         public bool Watched { get; set; }
 
-        public IEnumerable<ReviewViewModel> Comments { get; set; }
+        public IEnumerable<ReviewViewModel> Reviews { get; set; }
     }
 }
