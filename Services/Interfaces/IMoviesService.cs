@@ -24,8 +24,14 @@ namespace Lab1_.NET.Services
 
         Task<ServiceResponse<Movie, IEnumerable<EntityError>>> PutMovie(int id, MovieViewModel movieRequest);
 
+        Task<ServiceResponse<Review, IEnumerable<EntityError>>> PutReviewForMovie(int movieId, int reviewId, ReviewViewModel reviewRequest);
+
         Task<ServiceResponse<bool, IEnumerable<EntityError>>> DeleteMovie(int id);
 
+        Task<ServiceResponse<bool, IEnumerable<EntityError>>> DeleteReviewFromMovie(int reviewId);
+
         bool MovieExists(int id);
+
+        bool ReviewExists(int id);
     }
 }

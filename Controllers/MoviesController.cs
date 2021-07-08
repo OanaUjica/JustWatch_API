@@ -212,6 +212,38 @@ namespace Lab1_.NET.Controllers
         }
 
         /// <summary>
+        /// Updates a review.
+        /// </summary>
+        /// <response code="204">If the review was successfully updated.</response>
+        /// <response code="400">If the ID in the URL doesn't match the one in the body.</response>
+        /// <response code="404">If the review is not found.</response>
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(AuthenticationSchemes = "Identity.Application,Bearer")]
+        [HttpPut("{movieId}/Reviews/{reviewId}")]
+        public async Task<IActionResult> PutReviewForMovie(int movieId, int reviewId, ReviewViewModel reviewRequest)
+        {
+            if (!_moviesService.MovieExists(movieId))
+            {
+                return NotFound();
+            }
+
+            if (!_moviesService.ReviewExists(reviewId))
+            {
+                return NotFound();
+            }
+
+            var reviewResponse = await _moviesService.PutReviewForMovie(movieId, reviewId, reviewRequest);
+
+            if (reviewResponse.ResponseError != null)
+            {
+                return BadRequest(reviewResponse.ResponseError);
+            }
+
+            return NoContent();
+        }
+        /// <summary>
         /// Delete a movie by id
         /// </summary>
         /// <response code="204">Delete a movie</response>
@@ -245,6 +277,34 @@ namespace Lab1_.NET.Controllers
             }
 
             return NoContent();
+        }
+
+        /// <summary>
+        /// Deletes a review from a movie.
+        /// </summary>
+        /// <response code="204">No content if successful.</response>
+        /// <response code="404">If the review doesn't exist.</response>  
+        /// <response code="400">If something goes wrong.</response>  
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [HttpDelete("Reviews/{reviewId}")]
+        [Authorize(AuthenticationSchemes = "Identity.Application,Bearer")]
+        public async Task<IActionResult> DeleteReviewFromMovie(int reviewId)
+        {
+            if (!_moviesService.ReviewExists(reviewId))
+            {
+                return NotFound();
+            }
+
+            var result = await _moviesService.DeleteReviewFromMovie(reviewId);
+
+            if (result.ResponseError == null)
+            {
+                return NoContent();
+            }
+
+            return StatusCode(500);
         }
     }
 }

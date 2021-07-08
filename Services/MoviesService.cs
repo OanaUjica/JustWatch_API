@@ -214,6 +214,35 @@ namespace Lab1_.NET.Services
             return serviceResponse;
         }
 
+        public async Task<ServiceResponse<Review, IEnumerable<EntityError>>> PutReviewForMovie(int movieId, int reviewId, ReviewViewModel reviewRequest)
+        {
+            var serviceResponse = new ServiceResponse<Review, IEnumerable<EntityError>>();
+            reviewRequest.Id = reviewId;
+            var review = _mapper.Map<Review>(reviewRequest);
+            review.MovieId = movieId;
+            var movie = await _context.Movies
+                .Where(m => m.Id == movieId)
+                .FirstOrDefaultAsync();
+            review.Movie = movie;
+
+            try
+            {
+                _context.Entry(review).State = EntityState.Modified;
+                await _context.SaveChangesAsync();
+                serviceResponse.ResponseOk = review;
+            }
+            catch (Exception e)
+            {
+                var errors = new List<EntityError>
+                {
+                    new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message }
+                };
+                serviceResponse.ResponseError = errors;
+            }
+
+            return serviceResponse;
+        }
+
         public async Task<ServiceResponse<bool, IEnumerable<EntityError>>> DeleteMovie(int id)
         {
             var serviceResponse = new ServiceResponse<bool, IEnumerable<EntityError>>();
@@ -237,9 +266,37 @@ namespace Lab1_.NET.Services
             return serviceResponse;
         }
 
+        public async Task<ServiceResponse<bool, IEnumerable<EntityError>>> DeleteReviewFromMovie(int reviewId)
+        {
+            var serviceResponse = new ServiceResponse<bool, IEnumerable<EntityError>>();
+
+            try
+            {
+                var review = await _context.Reviews.FindAsync(reviewId);
+                _context.Reviews.Remove(review);
+                await _context.SaveChangesAsync();
+                serviceResponse.ResponseOk = true;
+            }
+            catch (Exception e)
+            {
+                var errors = new List<EntityError>
+                {
+                    new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message }
+                };
+                serviceResponse.ResponseError = errors;
+            }
+
+            return serviceResponse;
+        }
+
         public bool MovieExists(int id)
         {
             return _context.Movies.Any(e => e.Id == id);
+        }
+
+        public bool ReviewExists(int id)
+        {
+            return _context.Reviews.Any(e => e.Id == id);
         }
     }
 }
