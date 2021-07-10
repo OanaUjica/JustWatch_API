@@ -61,9 +61,9 @@ namespace Lab1_.NET.Controllers
         }
 
         /// <summary>
-        /// Get movie with comments
+        /// Get movie with reviews
         /// </summary>
-        /// <response code="200">Get movie with comments</response>
+        /// <response code="200">Get movie with reviews</response>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet("{id}/Reviews")]
         public async Task<ActionResult<IEnumerable<MovieWithReviewsViewModel>>> GetReviewsForMovie(int id, int? page = 1, int? perPage = 5)
@@ -143,9 +143,9 @@ namespace Lab1_.NET.Controllers
         }
 
         /// <summary>
-        /// Add a new comment to movie
+        /// Add a new review to movie
         /// </summary>
-        /// <response code="201">Add a new comment to movie</response>
+        /// <response code="201">Add a new review to movie</response>
         /// <response code="404">Movie not found</response>
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

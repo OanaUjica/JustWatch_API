@@ -27,10 +27,10 @@ namespace Lab1_.NET.Controllers
         }
 
         /// <summary>
-        /// Add a new reservation
+        /// Add a new movie to watchlist
         /// </summary>
-        /// <response code="201">Add a new reservation</response>
-        /// <response code="400">Unable to add the reservation due to validation error</response>
+        /// <response code="201">Add a new movie to watchlist</response>
+        /// <response code="400">Unable to add the watchlist due to validation error</response>
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [HttpPost]
@@ -59,9 +59,9 @@ namespace Lab1_.NET.Controllers
 
 
         /// <summary>
-        /// Get reservations
+        /// Get watchlist
         /// </summary>
-        /// <response code="200">Get reservations</response>
+        /// <response code="200">Get watchlist</response>
         [ProducesResponseType(StatusCodes.Status200OK)]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<WatchlistsForUserResponse>>> GetAllWatchlists(int? page = 1, int? perPage = 5)
@@ -82,11 +82,11 @@ namespace Lab1_.NET.Controllers
         }
 
         /// <summary>
-        /// Amend a reservation
+        /// Amend a watchlist
         /// </summary>
-        /// <response code="204">Amend a reservation</response>
-        /// <response code="400">Unable to amend the reservation due to validation error</response>
-        /// <response code="404">Reservation not found</response>
+        /// <response code="204">Amend a watchlist</response>
+        /// <response code="400">Unable to amend the watchlist due to validation error</response>
+        /// <response code="404">watchlist not found</response>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -118,10 +118,10 @@ namespace Lab1_.NET.Controllers
         }
 
         /// <summary>
-        /// Delete a reservation by id
+        /// Delete a movie from watchlist by id
         /// </summary>
-        /// <response code="204">Delete a reservation</response>
-        /// <response code="404">Reservation not found</response>
+        /// <response code="204">Delete a movie from watchlist</response>
+        /// <response code="404">Movie not found on watchlist</response>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("{id}/Movie")]
