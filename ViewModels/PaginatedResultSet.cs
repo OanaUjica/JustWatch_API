@@ -14,7 +14,7 @@ namespace Lab1_.NET.ViewModels
 
         public int TotalEntities { get; set; }
 
-        public IEnumerable<TEntity> Entities { get; set; }
+        public List<TEntity> Entities { get; set; }
 
         /*
          * pagina curent:           currentPage

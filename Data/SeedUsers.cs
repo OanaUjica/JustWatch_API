@@ -35,6 +35,7 @@ namespace Lab1_.NET.Data
                         Role = role
                     };
                     user.PasswordHash = userContext.PasswordHasher.HashPassword(user, "Test1234!");
+                    user.EmailConfirmed = true;
                     context.Users.Add(user);
                 }
 

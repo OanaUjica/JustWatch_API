@@ -124,41 +124,6 @@ namespace Lab1_.NET.Controllers
         /// <response code="404">Reservation not found</response>
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteWatchlist(int id)
-        {
-            var user = new ApplicationUser();
-            try
-            {
-                user = await _userManager?.FindByNameAsync(User?.FindFirst(ClaimTypes.NameIdentifier)?.Value);
-            }
-            catch (ArgumentNullException)
-            {
-                return Unauthorized("Please login!");                
-            }
-
-            if (!_watchlistsService.WatchlistExists(id))
-            {
-                return NotFound();
-            }
-
-            var reservationServiceResult = await _watchlistsService.DeleteWatchlist(id);
-            if (reservationServiceResult.ResponseError != null)
-            {
-                return BadRequest(reservationServiceResult.ResponseError);
-            }
-
-            return NoContent();
-        }
-
-
-        /// <summary>
-        /// Delete a reservation by id
-        /// </summary>
-        /// <response code="204">Delete a reservation</response>
-        /// <response code="404">Reservation not found</response>
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [HttpDelete("{id}/Movie")]
         public async Task<IActionResult> DeleteMovieFromWatchlist(int id)
         {

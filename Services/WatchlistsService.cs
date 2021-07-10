@@ -47,9 +47,11 @@ namespace Lab1_.NET.Services
 
             int count = await _context.Movies.CountAsync();
             var resultSet = new PaginatedResultSet<WatchlistsForUserResponse>(reservationsForUserResponse, page.Value, count, perPage.Value);
-                        
-            var serviceResponse = new ServiceResponse<PaginatedResultSet<WatchlistsForUserResponse>, IEnumerable<EntityError>>();
-            serviceResponse.ResponseOk = resultSet;
+
+            var serviceResponse = new ServiceResponse<PaginatedResultSet<WatchlistsForUserResponse>, IEnumerable<EntityError>>
+            {
+                ResponseOk = resultSet
+            };
 
             return serviceResponse;
         }
@@ -84,8 +86,10 @@ namespace Lab1_.NET.Services
             }
             catch (Exception e)
             {
-                var errors = new List<EntityError>();
-                errors.Add(new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message });
+                var errors = new List<EntityError>
+                {
+                    new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message }
+                };
             }
 
             return serviceResponse;
@@ -122,29 +126,10 @@ namespace Lab1_.NET.Services
             }
             catch (Exception e)
             {
-                var errors = new List<EntityError>();
-                errors.Add(new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message });
-            }
-
-            return serviceResponse;
-        }
-
-        public async Task<ServiceResponse<bool, IEnumerable<EntityError>>> DeleteWatchlist(int id)
-        {
-            var serviceResponse = new ServiceResponse<bool, IEnumerable<EntityError>>();
-
-            try
-            {
-                var watchlist = await _context.Watchlists.FindAsync(id);
-                _context.Watchlists.Remove(watchlist);
-                await _context.SaveChangesAsync();
-                serviceResponse.ResponseOk = true;
-            }
-            catch (Exception e)
-            {
-                var errors = new List<EntityError>();
-                errors.Add(new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message });
-                serviceResponse.ResponseError = errors;
+                var errors = new List<EntityError>
+                {
+                    new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message }
+                };
             }
 
             return serviceResponse;
@@ -165,8 +150,10 @@ namespace Lab1_.NET.Services
             }
             catch (Exception e)
             {
-                var errors = new List<EntityError>();
-                errors.Add(new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message });
+                var errors = new List<EntityError>
+                {
+                    new EntityError { ErrorType = e.GetType().ToString(), Message = e.Message }
+                };
                 serviceResponse.ResponseError = errors;
             }
 
